@@ -6,3 +6,10 @@ $text-green: #008000;
 $bg-yellow: #fffa00;
 $text-normal: #333333;
 $text-disable: #b0c2d0;
+
+$breakpoints: (
+  "sx": 575.98px,
+  "sm": 767.98px,
+  "md": 991.98px,
+  "lg": 1199.98px,
+) !default;

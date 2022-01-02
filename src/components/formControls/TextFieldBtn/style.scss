@@ -1,0 +1,23 @@
+@import '../../../assets/scss/variable';
+
+.search-normal {
+  border: 2px solid $bg-primary !important;
+  margin: 5px;
+  width: auto !important;
+  &__delete {
+    color: $text-green;
+    border: none !important;
+    background-color: $bg-grey !important;
+  }
+  &__submit {
+    color: $text-green;
+    border: none !important;
+    background-color: $bg-yellow !important;
+  }
+  &__input {
+    border: none !important;
+    &:focus {
+      background-color: $bg-yellow !important;
+    }
+  }
+}

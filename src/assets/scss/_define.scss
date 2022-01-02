@@ -1,4 +1,4 @@
-@import "../scss/variable";
+@import '../scss/variable';
 .btn-reset {
   box-shadow: none !important;
 }
@@ -13,4 +13,15 @@
 
 .color-white {
   color: $text-white !important;
+}
+
+.bg-yellow {
+  background-color: $bg-yellow !important;
+  &:hover {
+    color: $text-white !important;
+  }
+}
+
+.btn {
+  height: fit-content;
 }

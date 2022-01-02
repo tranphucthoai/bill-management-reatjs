@@ -1,0 +1,59 @@
+@import '../../../assets/scss/variable';
+@import '../../../assets/scss/mixin';
+.main-col {
+  background-color: $bg-primary;
+  padding: 30px 20px;
+  min-height: 100vh;
+
+  &__heading {
+    color: $text-white;
+    font-size: 1.875rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    margin-bottom: 15px;
+  }
+  &__title {
+    color: $text-white;
+    font-weight: 600;
+    display: inline-flex;
+    // font-size: 0.9375rem;
+    font-size: 1rem;
+
+    border-bottom: 2px solid $text-white;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+  }
+}
+
+.action {
+  display: flex;
+  justify-content: center;
+  margin: -5px;
+  > li {
+    padding: 5px;
+  }
+}
+
+.search-footer {
+  background-color: $text-white;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.table-normal {
+  thead {
+    tr {
+      background-color: $bg-yellow;
+
+      th {
+        text-align: center;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  td {
+    text-align: center;
+    vertical-align: middle;
+  }
+}

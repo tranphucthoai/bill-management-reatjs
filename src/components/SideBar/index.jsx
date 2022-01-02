@@ -13,7 +13,7 @@ function SideBar() {
                     BƯU ĐIỆN - VIETTEL TRƯỜNG THỌ
                 </h3>
 
-                <Dropdown classNamea="sidebar__dropdown">
+                <Dropdown className="sidebar__dropdown">
                     <Dropdown.Toggle variant="success" id="dropdown-basic" className='btn-reset'>
                         Chọn loại hoá đơn
                     </Dropdown.Toggle>
