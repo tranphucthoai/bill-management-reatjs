@@ -1,0 +1,18 @@
+@import "../../assets/scss/variable";
+.input-normal {
+  .input-group-text {
+    background-color: $bg-grey;
+    i {
+      color: $text-green;
+    }
+  }
+  > input {
+    color: $text-normal;
+    &::placeholder {
+      font-size: 0.875rem;
+    }
+    &:focus {
+      background-color: $bg-yellow;
+    }
+  }
+}
