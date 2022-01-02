@@ -1,3 +1,16 @@
+@import "../scss/variable";
 .btn-reset {
   box-shadow: none !important;
+}
+
+.btn-default {
+  padding: 5px 10px;
+}
+
+.color-blue {
+  color: $text-blue !important;
+}
+
+.color-white {
+  color: $text-white !important;
 }

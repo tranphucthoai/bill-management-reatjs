@@ -1,0 +1,41 @@
+@import "../../assets/scss/variable";
+
+.radio-group {
+  display: flex;
+
+  > li {
+    &:first-child {
+      .radio-normal {
+        .radio-normal__label {
+          border-radius: 5px 0 0 5px;
+        }
+      }
+    }
+    &:last-child {
+      .radio-normal {
+        .radio-normal__label {
+          border-radius: 0 5px 5px 0;
+        }
+      }
+    }
+  }
+}
+
+.radio-normal {
+  &__label {
+    font-weight: 500;
+    color: $text-disable;
+    background-color: $text-white;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  &__input {
+    &:checked {
+      & ~ .radio-normal__label {
+        color: $text-white;
+        background-color: $text-green;
+      }
+    }
+  }
+}
