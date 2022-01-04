@@ -4,6 +4,7 @@ import React from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
 import './style.scss';
 // import clsx from 'clsx';
+import { formatPrice } from './../../../constans/common';
 
 TextField.propTypes = {
   form: PropTypes.object,

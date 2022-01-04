@@ -9,7 +9,7 @@ RadioGroup.propTypes = {
   handleChange: PropTypes.func,
 };
 
-function RadioGroup({ value = [], nameGroup = '', slectedItem = 0, handleChange = null }) {
+function RadioGroup({ value = [], nameGroup = '', selectedItem = 0, handleChange = null }) {
   return (
     <ul className="radio-group mb-3">
       {value?.map((item, index) => (
@@ -22,9 +22,10 @@ function RadioGroup({ value = [], nameGroup = '', slectedItem = 0, handleChange 
               type="radio"
               id={item.name}
               hidden
-              checked={slectedItem === index}
+              defaultChecked={item.isChecked}
+              onClick={() => handleChange(index, nameGroup)}
             />
-            <label htmlFor={item.name} className="radio-normal__label" onClick={() => handleChange(item.name)}>
+            <label htmlFor={item.name} className="radio-normal__label">
               {item.text}
             </label>
           </div>

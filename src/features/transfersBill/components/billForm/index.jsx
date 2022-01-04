@@ -30,38 +30,57 @@ function BillForm() {
     },
   });
 
-  const [formOfReceipt, setFormOfReceipt] = useState(0);
-  const [status, setStatus] = useState(0);
-
-  const handleSelectedItem = (name) => {
-    setStatus(name);
-  };
-
-  const statusProcess = [
-    {
-      name: 'processed',
-      text: 'Đã xử lí',
-    },
-    {
-      name: 'peding',
-      text: 'Chưa xử lý',
-    },
-  ];
-
-  const formPayments = [
+  const [formOfReceipt, setFormOfReceipt] = useState([
     {
       name: 'home',
       text: 'Tại nhà',
+      isChecked: true,
     },
     {
       name: 'office',
       text: 'Văn phòng',
+      isChecked: false,
     },
     {
       name: 'banking',
       text: 'Chuyển khoản',
+      isChecked: false,
     },
-  ];
+  ]);
+  const [status, setStatus] = useState([
+    {
+      name: 'processed',
+      text: 'Đã xử lí',
+      isChecked: true,
+    },
+    {
+      name: 'peding',
+      text: 'Chưa xử lý',
+      isChecked: false,
+    },
+  ]);
+
+  const handleSelectedItem = (index, nameGroup) => {
+    if (nameGroup === 'status') {
+      setStatus(
+        status.map((item, indexItem) => ({
+          ...item,
+          isChecked: index === indexItem ? true : false,
+        }))
+      );
+      // console.log('status', status);
+    }
+    if (nameGroup === 'formPayments') {
+      setFormOfReceipt(
+        formOfReceipt.map((item, indexItem) => ({
+          ...item,
+          isChecked: index === indexItem ? true : false,
+        }))
+      );
+      // console.log('formOfReceipt', formOfReceipt);
+    }
+  };
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <Row>
@@ -117,12 +136,12 @@ function BillForm() {
       <Row>
         <Col md={6}>
           <h4 className="main-col__title">Hình thức nhận tiền</h4>
-          <RadioGroup nameGroup="formPayments" handleChange={handleSelectedItem} value={formPayments} />
+          <RadioGroup nameGroup="formPayments" handleChange={handleSelectedItem} value={formOfReceipt} />
         </Col>
         <Col md={6}>
           <h4 className="main-col__title">Trạng thái xử lý</h4>
           <div className="d-flex">
-            <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={statusProcess} />
+            <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
             <Button type="submit" variant="md" className="ms-5 btn-reset bg-yellow color-blue">
               <i className="fa fa-print"></i> In
             </Button>
