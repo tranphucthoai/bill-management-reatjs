@@ -3,6 +3,8 @@ import { Button, Col, Row, Table } from 'react-bootstrap';
 import transferReceiptsApi from '../../../../api/transferReceiptsApi';
 import TextFieldBtn from './../../../../components/formControls/TextFieldBtn/index';
 import { formatPrice } from './../../../../constans/common';
+import { edit } from '../../transfersBillSlice';
+import { useDispatch } from 'react-redux';
 
 function BillTable() {
   const [data, setData] = useState([]);
@@ -17,6 +19,10 @@ function BillTable() {
       }
     })();
   }, []);
+  const dispatch = useDispatch();
+  const handleEdit = () => {
+    dispatch(edit());
+  };
   return (
     <>
       <Row>
@@ -84,7 +90,7 @@ function BillTable() {
                           </Button>
                         </li>
                         <li>
-                          <Button variant="danger" size="sm">
+                          <Button onClick={handleEdit} variant="danger" size="sm">
                             <i className="fa fa-eye"></i>
                           </Button>
                         </li>

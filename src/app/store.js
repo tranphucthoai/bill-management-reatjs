@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
-import actionTransfersBill from '../features/transfersBill/transfersBillSlice';
+import transfersBillReducer from '../features/transfersBill/transfersBillSlice';
 
 const rootReducer = {
-  counter: actionTransfersBill,
+  transfersBill: transfersBillReducer,
 };
 
 const store = configureStore({

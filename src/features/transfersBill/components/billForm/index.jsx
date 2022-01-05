@@ -1,13 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import RadioGroup from './../../../../components/formControls/RadioGroup/index';
 import TextField from './../../../../components/formControls/TextField/index';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useSelector } from 'react-redux';
+import transferReceiptsApi from '../../../../api/transferReceiptsApi';
 
 function BillForm() {
+  useEffect(() => {
+    (async () => {
+      try {
+        const respone = await transferReceiptsApi.get('ok');
+      } catch (error) {
+        console.log('Failed to fetch Api', error);
+      }
+    })();
+  }, []);
+  const initValForm = {
+    senderPhone: '',
+    senderName: '',
+    senderCardId: '',
+    senderAddress: '',
+    receiverPhone: '',
+    receiverName: '',
+    receiverCardId: '',
+    receiverAddress: '',
+    bankPlusPhone: '',
+    transferAmount: '',
+    transferFee: '',
+    accountNumber: '',
+  };
+
+  const fillValForm = {
+    senderPhone: '1',
+    senderName: '2',
+    senderCardId: '3',
+    senderAddress: '',
+    receiverPhone: '',
+    receiverName: '',
+    receiverCardId: '',
+    receiverAddress: '',
+    bankPlusPhone: '',
+    transferAmount: '',
+    transferFee: '',
+    accountNumber: '',
+  };
+
+  const transfersBill = useSelector((state) => state.transfersBill);
+
   const formik = useFormik({
-    initialValues: {},
+    initialValues: transfersBill ? initValForm : fillValForm,
     validationSchema: Yup.object({
       senderPhone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
       senderName: Yup.string().min(5, 'Vui lòng nhập họ và tên').required('Vui lòng nhập họ và tên'),
@@ -21,9 +64,13 @@ function BillForm() {
         .min(13, 'Số CMND / Hộ chiếu ít nhất 13 chữ số')
         .required('Vui lòng nhập số CMND / Hộ chiếu'),
       receiverAddress: Yup.string().required('Vui lòng nhập địa chỉ'),
+
       bankPlusPhone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
       transferAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
       transferFee: Yup.number().required('Vui lòng nhập lệ phí'),
+      accountNumber: Yup.number()
+        .min(10, 'Vui lòng nhập Số tài khoản / Số thẻ')
+        .required('Vui lòng nhập Số tài khoản / Số thẻ'),
     }),
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
@@ -59,7 +106,6 @@ function BillForm() {
       isChecked: false,
     },
   ]);
-
   const handleSelectedItem = (index, nameGroup) => {
     if (nameGroup === 'status') {
       setStatus(
@@ -104,7 +150,7 @@ function BillForm() {
           <h4 className="main-col__title">Thông tin gửi tiền</h4>
           <TextField
             form={formik}
-            name="receiverCardId"
+            name="accountNumber"
             icon={'fa-credit-card-alt'}
             placeholder={'Số tài khoản / Số thẻ'}
           />
@@ -143,7 +189,7 @@ function BillForm() {
           <div className="d-flex">
             <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
             <Button type="submit" variant="md" className="ms-5 btn-reset bg-yellow color-blue">
-              <i className="fa fa-print"></i> In
+              <i className="fa fa-print"></i> {transfersBill ? 'Cập nhật' : 'Lưu'}
             </Button>
           </div>
         </Col>

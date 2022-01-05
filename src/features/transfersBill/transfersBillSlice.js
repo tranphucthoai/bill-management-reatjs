@@ -1,20 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const transfersBillSlice = createSlice({
-  name: 'actionTransfersBill',
-  initialState: {
-    statusAction: false,
-  },
+  name: 'transfersBill',
+  initialState: false,
   reducers: {
-    update(state) {
-      state.statusAction = true;
+    edit(state) {
+      return true;
     },
     create(state) {
-      state.showMiniCart = false;
+      return false;
     },
   },
 });
 
 const { actions, reducer } = transfersBillSlice;
-export const { update, create } = actions;
+export const { edit, create } = actions;
 export default reducer;
