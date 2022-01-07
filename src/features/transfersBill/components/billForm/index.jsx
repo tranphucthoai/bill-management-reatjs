@@ -34,23 +34,24 @@ function BillForm() {
 
   const fillValForm = {
     senderPhone: '1',
-    senderName: '2',
+    senderName: '234343434',
     senderCardId: '3',
-    senderAddress: '',
-    receiverPhone: '',
-    receiverName: '',
-    receiverCardId: '',
-    receiverAddress: '',
-    bankPlusPhone: '',
-    transferAmount: '',
-    transferFee: '',
-    accountNumber: '',
+    senderAddress: '2',
+    receiverPhone: '2',
+    receiverName: '2',
+    receiverCardId: '2',
+    receiverAddress: '2',
+    bankPlusPhone: '2',
+    transferAmount: '2',
+    transferFee: '2',
+    accountNumber: '2',
   };
 
   const transfersBill = useSelector((state) => state.transfersBill);
 
   const formik = useFormik({
-    initialValues: transfersBill ? initValForm : fillValForm,
+    initialValues: initValForm,
+    setValues: transfersBill ? initValForm : fillValForm,
     validationSchema: Yup.object({
       senderPhone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
       senderName: Yup.string().min(5, 'Vui lòng nhập họ và tên').required('Vui lòng nhập họ và tên'),
@@ -127,6 +128,8 @@ function BillForm() {
     }
   };
 
+  // transfersBill ? formik.setValues(initValForm) : formik.setValues(fillValForm);
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <Row>
@@ -188,7 +191,12 @@ function BillForm() {
           <h4 className="main-col__title">Trạng thái xử lý</h4>
           <div className="d-flex">
             <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
-            <Button type="submit" variant="md" className="ms-5 btn-reset bg-yellow color-blue">
+            <Button
+              // onClick={handleSubmitForm}
+              type="submit"
+              variant="md"
+              className="ms-5 btn-reset bg-yellow color-blue"
+            >
               <i className="fa fa-print"></i> {transfersBill ? 'Cập nhật' : 'Lưu'}
             </Button>
           </div>
