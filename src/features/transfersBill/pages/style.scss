@@ -57,3 +57,29 @@
     vertical-align: middle;
   }
 }
+
+.box-status {
+  &__label {
+    font-size: 25px;
+    cursor: pointer;
+    i {
+      color: $bg-primary;
+    }
+  }
+  &__input {
+    &:checked ~ .box-status__label {
+      i {
+        &::before {
+          content: '\f046';
+        }
+      }
+    }
+  }
+  &__label {
+    i {
+      &::before {
+        content: '\f096';
+      }
+    }
+  }
+}

@@ -13,8 +13,8 @@ const transferReceiptsApi = {
     const url = '/transferReceipts';
     return axiosClient.post(url, data);
   },
-  update(data) {
-    const url = '/transferReceipts';
+  update(id, data) {
+    const url = `/transferReceipts/${id}`;
     return axiosClient.patch(url, data);
   },
   remove(id) {

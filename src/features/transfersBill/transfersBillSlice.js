@@ -2,13 +2,22 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const transfersBillSlice = createSlice({
   name: 'transfersBill',
-  initialState: false,
+  initialState: {
+    isUpdate: false,
+    idItem: '',
+  },
   reducers: {
-    edit(state) {
-      return true;
+    edit(state, action) {
+      return {
+        isUpdate: true,
+        idItem: action.payload,
+      };
     },
-    create(state) {
-      return false;
+    create(state, action) {
+      return {
+        isUpdate: false,
+        idItem: '',
+      };
     },
   },
 });
