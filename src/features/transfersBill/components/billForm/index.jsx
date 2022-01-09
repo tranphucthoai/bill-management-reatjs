@@ -1,5 +1,5 @@
 import { useFormik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
@@ -8,13 +8,18 @@ import { create, edit } from '../../transfersBillSlice';
 import RadioGroup from './../../../../components/formControls/RadioGroup/index';
 import TextField from './../../../../components/formControls/TextField/index';
 import BillTable from './../billTable/index';
+import { default as VNnum2words } from 'vn-num2words';
 
 function BillForm() {
   const [reLoad, setReload] = useState(false);
   const [paymentsSelected, setPaymentsSelected] = useState(0);
   const [statusSelected, setStatusSelected] = useState(0);
-  const [fillVal, setFillVal] = useState({});
   const dispatch = useDispatch();
+  const { isUpdate, idItem } = useSelector((state) => state.transfersBill);
+  const refPaymentAmountText = useRef();
+
+  //call api load data table
+
   useEffect(() => {
     (async () => {
       try {
@@ -24,6 +29,9 @@ function BillForm() {
       }
     })();
   }, []);
+
+  //init formik
+
   const initValForm = {
     senderPhone: '',
     senderName: '',
@@ -37,23 +45,8 @@ function BillForm() {
     transferAmount: '',
     transferFee: '',
     accountNumber: '',
+    paymentAmount: '',
   };
-
-  const fillValForm = {
-    senderPhone: '1',
-    senderName: '234343434',
-    senderCardId: '3',
-    senderAddress: '2',
-    receiverPhone: '2',
-    receiverName: '2',
-    receiverCardId: '2',
-    receiverAddress: '2',
-    bankPlusPhone: '2',
-    transferAmount: '2',
-    transferFee: '2',
-    accountNumber: '2',
-  };
-  const transfersBill = useSelector((state) => state.transfersBill);
 
   const formik = useFormik({
     initialValues: initValForm,
@@ -79,27 +72,29 @@ function BillForm() {
         .required('Vui lòng nhập Số tài khoản / Số thẻ'),
     }),
     onSubmit: async (values) => {
-      if (transfersBill.isUpdate) {
+      // values.paymentAmount = values.transferAmount - values.transferFee;
+      values.formOfReceipt = paymentsSelected;
+      values.status = statusSelected;
+      values.branchId = localStorage.getItem('userID');
+      values.isCheckDelete = true;
+      values.createdBy = '';
+      values.senderCardIdDateOfIssue = 0;
+      values.senderCardIdPlaceOfIssue = values.senderAddress;
+      values.receiverCardIdDateOfIssue = 0;
+      values.receiverCardIdPlaceOfIssue = values.receiverAddress;
+      if (isUpdate) {
+        const respone = await transferReceiptsApi.update(idItem, values);
       } else {
-        values.paymentAmount = values.transferAmount - values.transferFee;
-        values.formOfReceipt = paymentsSelected;
-        values.status = statusSelected === 0 ? true : false;
-        values.branchId = localStorage.getItem('userID');
-
-        values.isCheckDelete = true;
-        values.createdBy = '';
-        values.senderCardIdDateOfIssue = 0;
-        values.senderCardIdPlaceOfIssue = values.senderAddress;
-        values.receiverCardIdDateOfIssue = 0;
-        values.receiverCardIdPlaceOfIssue = values.receiverAddress;
         const respone = await transferReceiptsApi.add(values);
-        console.log('respone transferReceipt', respone);
       }
-
       setReload((prev) => !prev);
+      dispatch(create());
       formik.resetForm();
     },
   });
+
+  //init values (status or form payments)
+
   const [formOfReceipt, setFormOfReceipt] = useState([
     {
       id: 0,
@@ -120,6 +115,7 @@ function BillForm() {
       isChecked: false,
     },
   ]);
+
   const [status, setStatus] = useState([
     {
       id: 0,
@@ -134,10 +130,14 @@ function BillForm() {
       isChecked: false,
     },
   ]);
-  const handleSelectedItem = (index, nameGroup) => {
+
+  //handle Selected Item (status or formPayments)
+
+  const handleSelectedItem = (index = 0, nameGroup) => {
     if (nameGroup === 'status') {
+      const newStatus = [...status];
       setStatus(
-        status.map((item, indexItem) => ({
+        newStatus.map((item, indexItem) => ({
           ...item,
           isChecked: index === indexItem ? true : false,
         }))
@@ -145,8 +145,9 @@ function BillForm() {
       setStatusSelected(index);
     }
     if (nameGroup === 'formPayments') {
+      const newFormOfReceipt = [...formOfReceipt];
       setFormOfReceipt(
-        formOfReceipt.map((item, indexItem) => ({
+        newFormOfReceipt.map((item = 0, indexItem) => ({
           ...item,
           isChecked: index === indexItem ? true : false,
         }))
@@ -154,14 +155,26 @@ function BillForm() {
       setPaymentsSelected(index);
     }
   };
+
+  //handleAdd
+
   const handleAdd = () => {
     dispatch(create());
     formik.resetForm();
   };
+
+  //handleDelete
+
   const handleDelete = async (id) => {
     const respone = await transferReceiptsApi.remove(id);
     setReload((prev) => !prev);
+
+    if (id === idItem) {
+      handleAdd();
+    }
   };
+  //handleEdit
+
   const handleEdit = async (id, checked) => {
     const respone = await transferReceiptsApi.update(id, {
       status: checked,
@@ -169,39 +182,72 @@ function BillForm() {
     setReload((prev) => !prev);
   };
 
+  //handleView
+
   useEffect(() => {
     (async () => {
       try {
-        const respone = await transferReceiptsApi.get(transfersBill.idItem);
-        setFillVal(respone);
-        // console.log('respone', respone);
+        const fillVal = await transferReceiptsApi.get(idItem);
+
+        formik.setValues(
+          {
+            senderPhone: fillVal.senderPhone,
+            senderName: fillVal.senderName,
+            senderCardId: fillVal.senderCardId,
+            senderAddress: fillVal.senderAddress,
+            receiverPhone: fillVal.receiverPhone,
+            receiverName: fillVal.receiverName,
+            receiverCardId: fillVal.receiverCardId,
+            receiverAddress: fillVal.receiverAddress,
+            bankPlusPhone: fillVal.bankPlusPhone,
+            transferAmount: fillVal.transferAmount,
+            transferFee: fillVal.transferFee,
+            accountNumber: fillVal.accountNumber,
+            paymentAmount: fillVal.paymentAmount,
+          },
+          false
+        );
+        const newStatus = [
+          {
+            id: 0,
+            name: 'processed',
+            text: 'Đã xử lí',
+            isChecked: fillVal.status,
+          },
+          {
+            id: 1,
+            name: 'peding',
+            text: 'Chưa xử lý',
+            isChecked: !fillVal.status,
+          },
+        ];
+
+        handleSelectedItem(fillVal.status, 'status');
+        handleSelectedItem(fillVal.formOfReceipt, 'formPayments');
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
     })();
-  }, [transfersBill.idItem]);
+  }, [idItem]);
+
   const handleView = (id) => {
+    formik.resetForm();
     dispatch(edit(id));
-
-    // console.log('keys', Object.keys(fillVal).length);
-
-    if (Object.keys(fillVal).length > 0) {
-      formik.setValues({
-        senderPhone: fillVal.senderPhone,
-        senderName: fillVal.senderName,
-        senderCardId: fillVal.senderCardId,
-        senderAddress: fillVal.senderAddress,
-        receiverPhone: fillVal.receiverPhone,
-        receiverName: fillVal.receiverName,
-        receiverCardId: fillVal.receiverCardId,
-        receiverAddress: fillVal.receiverAddress,
-        bankPlusPhone: fillVal.bankPlusPhone,
-        transferAmount: fillVal.transferAmount,
-        transferFee: fillVal.transferFee,
-        accountNumber: fillVal.accountNumber,
-      });
-    }
+    console.log('handleInputPaymentAmount', refPaymentAmountText.current.value);
   };
+
+  //scroll top
+
+  useEffect(() => {
+    window.scroll({ top: 0, behavior: 'smooth' });
+  }, [idItem]);
+
+  const handleInputTransferAmount = () => {};
+  const handleInputTransferFee = () => {};
+  const handleInputPaymentAmount = (e) => {
+    const value = e.target.value;
+  };
+
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -275,10 +321,18 @@ function BillForm() {
                   name="transferAmount"
                   icon={'fa-money'}
                   placeholder={'Số tiền muốn chuyển'}
+                  customInput={handleInputTransferAmount}
                 />
               </Col>
               <Col md={6}>
-                <TextField type="number" form={formik} name="transferFee" icon={'fa-plus'} placeholder={'Lệ phí'} />
+                <TextField
+                  type="number"
+                  form={formik}
+                  name="transferFee"
+                  icon={'fa-plus'}
+                  placeholder={'Lệ phí'}
+                  customInput={handleInputTransferFee}
+                />
               </Col>
             </Row>
           </Col>
@@ -297,12 +351,14 @@ function BillForm() {
               name="paymentAmount"
               icon={'fa-pause'}
               placeholder={'Số tiền thanh toán'}
+              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
         <Row>
           <Col>
             <TextField
+              ref={refPaymentAmountText}
               form={formik}
               name="paymentAmountText"
               icon={'fa-text-width'}
@@ -320,7 +376,7 @@ function BillForm() {
             <div className="d-flex">
               <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
               <Button type="submit" variant="md" className="ms-5 btn-reset bg-yellow color-blue">
-                <i className="fa fa-print"></i> {transfersBill.isUpdate ? 'Cập nhật' : 'Lưu'}
+                <i className="fa fa-print"></i> {isUpdate ? 'Cập nhật' : 'Lưu'}
               </Button>
             </div>
           </Col>

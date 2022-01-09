@@ -104,7 +104,7 @@ function BillTable({ reLoad = false, handleDelete = null, handleEdit = null, han
                           id={`statusTable${item.id}`}
                           type="checkbox"
                           hidden
-                          defaultChecked={item.status}
+                          checked={item.status == 0 ? true : false}
                         />
                         <label className="box-status__label" htmlFor={`statusTable${item.id}`}>
                           <i className="fa"></i>

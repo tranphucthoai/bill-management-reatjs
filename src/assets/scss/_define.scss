@@ -25,3 +25,13 @@
 .btn {
   height: fit-content;
 }
+
+.input-normal {
+  .invalid-feedback {
+    color: #ff8894 !important;
+  }
+  .is-invalid {
+    border: none !important;
+    background-color: #fff0f2;
+  }
+}

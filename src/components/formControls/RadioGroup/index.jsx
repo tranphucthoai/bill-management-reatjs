@@ -12,7 +12,7 @@ RadioGroup.propTypes = {
 function RadioGroup({ value = [], nameGroup = '', handleChange = null }) {
   return (
     <ul className="radio-group mb-3">
-      {value?.map((item) => (
+      {value?.map((item, index) => (
         <li key={item.id}>
           <div className="radio-normal">
             <input
@@ -22,8 +22,9 @@ function RadioGroup({ value = [], nameGroup = '', handleChange = null }) {
               type="radio"
               id={item.name}
               hidden
-              defaultChecked={item.isChecked}
-              onClick={() => handleChange(item.id, nameGroup)}
+              // defaultChecked={index === 0}
+              checked={item.isChecked}
+              onChange={() => handleChange(item.id, nameGroup)}
             />
             <label htmlFor={item.name} className="radio-normal__label">
               {item.text}

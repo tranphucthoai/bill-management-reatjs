@@ -12,9 +12,10 @@ TextField.propTypes = {
   placeholder: PropTypes.string,
   name: PropTypes.string,
   type: PropTypes.string,
+  customInput: PropTypes.func,
 };
 
-function TextField({ icon = '', placeholder = '', form = {}, name = '', type = 'text' }) {
+function TextField({ icon = '', placeholder = '', form = {}, name = '', type = 'text', customInput = null }) {
   return (
     <InputGroup hasValidation className={clsx('input-normal', !!form.errors[name] ? 'mb-2' : 'mb-4')}>
       <InputGroup.Text className="input-group-text">
@@ -24,8 +25,16 @@ function TextField({ icon = '', placeholder = '', form = {}, name = '', type = '
         type={type}
         name={name}
         placeholder={placeholder}
-        onChange={form.handleChange}
-        onBlur={form.handleBlur}
+        onChange={(e) => {
+          form.handleChange(e);
+          if (!customInput) return;
+          customInput(e);
+        }}
+        onBlur={(e) => {
+          form.handleBlur(e);
+          if (!customInput) return;
+          customInput(e);
+        }}
         value={form.values[name]}
         isInvalid={!!form.errors[name]}
         feedback={form.errors[name]}
