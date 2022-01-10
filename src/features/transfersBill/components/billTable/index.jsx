@@ -26,7 +26,6 @@ function BillTable({ reLoad = false, handleDelete = null, handleEdit = null, han
       }
     })();
   }, [reLoad]);
-  const dispatch = useDispatch();
   const onView = (id) => {
     if (!handleView) return;
     handleView(id);
@@ -99,7 +98,7 @@ function BillTable({ reLoad = false, handleDelete = null, handleEdit = null, han
                     <td>
                       <div className="box-status">
                         <input
-                          onClick={(e) => onEdit(item.id, e.target.checked)}
+                          onClick={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
                           className="box-status__input"
                           id={`statusTable${item.id}`}
                           type="checkbox"

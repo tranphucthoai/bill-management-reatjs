@@ -2,13 +2,14 @@ import { useFormik } from 'formik';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
+import { number } from 'yup/lib/locale';
 import transferReceiptsApi from '../../../../api/transferReceiptsApi';
 import { create, edit } from '../../transfersBillSlice';
 import RadioGroup from './../../../../components/formControls/RadioGroup/index';
 import TextField from './../../../../components/formControls/TextField/index';
 import BillTable from './../billTable/index';
-import { default as VNnum2words } from 'vn-num2words';
 
 function BillForm() {
   const [reLoad, setReload] = useState(false);
@@ -16,7 +17,6 @@ function BillForm() {
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.transfersBill);
-  const refPaymentAmountText = useRef();
 
   //call api load data table
 
@@ -204,8 +204,9 @@ function BillForm() {
             transferFee: fillVal.transferFee,
             accountNumber: fillVal.accountNumber,
             paymentAmount: fillVal.paymentAmount,
+            paymentAmountText: VNnum2words(fillVal.paymentAmount),
           },
-          false
+          true
         );
         const newStatus = [
           {
@@ -231,9 +232,8 @@ function BillForm() {
   }, [idItem]);
 
   const handleView = (id) => {
-    formik.resetForm();
+    dispatch(edit(''));
     dispatch(edit(id));
-    console.log('handleInputPaymentAmount', refPaymentAmountText.current.value);
   };
 
   //scroll top
@@ -242,10 +242,32 @@ function BillForm() {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
 
-  const handleInputTransferAmount = () => {};
-  const handleInputTransferFee = () => {};
+  // const handleInputTransferAmount = (e, valueTransferAmount, valueTransferFee) => {
+  //   if (valueTransferFee) {
+  //     const newValue = Number.parseInt(e.target.value) - valueTransferFee;
+  //     formik.setValues(
+  //       {
+  //         paymentAmountText: VNnum2words(newValue),
+  //         paymentAmount: newValue,
+  //       },
+  //       false
+  //     );
+  //   }
+  // };
+  const handleInputTransferFee = (e, valueTransferAmount, valueTransferFee) => {
+    if (valueTransferAmount) {
+      const newValue = valueTransferAmount - Number.parseInt(e.target.value);
+      formik.setValues(
+        {
+          paymentAmountText: VNnum2words(newValue),
+          paymentAmount: newValue,
+        },
+        false
+      );
+    }
+  };
   const handleInputPaymentAmount = (e) => {
-    const value = e.target.value;
+    console.log('e.target.value', e.target.value);
   };
 
   return (
@@ -321,7 +343,7 @@ function BillForm() {
                   name="transferAmount"
                   icon={'fa-money'}
                   placeholder={'Số tiền muốn chuyển'}
-                  customInput={handleInputTransferAmount}
+                  // customInput={handleInputTransferAmount}
                 />
               </Col>
               <Col md={6}>
@@ -346,6 +368,7 @@ function BillForm() {
               placeholder={'Số điện thoại bank plus'}
             />
             <TextField
+              readOnly={true}
               type="number"
               form={formik}
               name="paymentAmount"
@@ -358,11 +381,12 @@ function BillForm() {
         <Row>
           <Col>
             <TextField
-              ref={refPaymentAmountText}
+              readOnly={true}
               form={formik}
               name="paymentAmountText"
               icon={'fa-text-width'}
               placeholder={'Số tiền thanh toán bằng chữ'}
+              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
