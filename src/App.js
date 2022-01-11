@@ -3,6 +3,7 @@ import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import './app.scss';
 import SideBar from './components/SideBar';
+import Login from './features/login/pages';
 import TransfersBill from './features/transfersBill/pages';
 
 function App() {
@@ -14,7 +15,8 @@ function App() {
             <SideBar />
           </Col>
           <Col xl={9}>
-            <TransfersBill />
+            {/* <TransfersBill /> */}
+            <Login />
           </Col>
         </Row>
       </Container>

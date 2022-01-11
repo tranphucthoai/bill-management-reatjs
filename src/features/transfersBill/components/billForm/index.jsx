@@ -72,7 +72,7 @@ function BillForm() {
         .required('Vui lòng nhập Số tài khoản / Số thẻ'),
     }),
     onSubmit: async (values) => {
-      // values.paymentAmount = values.transferAmount - values.transferFee;
+      values.paymentAmount = values.transferAmount - values.transferFee;
       values.formOfReceipt = paymentsSelected;
       values.status = statusSelected;
       values.branchId = localStorage.getItem('userID');

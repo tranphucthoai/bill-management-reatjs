@@ -33,23 +33,8 @@ function TextField({
         type={type}
         name={name}
         placeholder={placeholder}
-        onChange={(e) => {
-          form.handleChange(e);
-          if (customInput) {
-            customInput(e, form.values['transferAmount'], form.values['transferFee']);
-          }
-        }}
-        onBlur={(e) => {
-          form.handleBlur(e);
-          if (customInput) {
-            customInput(e, form.values['transferAmount'], form.values['transferFee']);
-          }
-        }}
-        onInput={(e) => {
-          if (customInput) {
-            customInput(e, form.values['transferAmount'], form.values['transferFee']);
-          }
-        }}
+        onChange={form.handleChange}
+        onBlur={form.handleBlur}
         value={form.values[name]}
         isInvalid={!!form.errors[name]}
         feedback={form.errors[name]}

@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import transferReceiptsApi from '../../../../api/transferReceiptsApi';
 import TextFieldBtn from './../../../../components/formControls/TextFieldBtn/index';
 import { formatPrice } from './../../../../constans/common';
 import { useDispatch } from 'react-redux';
 import propTypes from 'prop-types';
+import { useLocation, useNavigate } from 'react-router-dom';
+import queryString from 'query-string';
+import moment from 'moment';
 
 BillTable.propTypes = {
   reLoad: propTypes.bool,
@@ -15,17 +18,31 @@ BillTable.propTypes = {
 
 function BillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
   const [data, setData] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = queryString.parse(location.search);
+
+  const queryParams = useMemo(() => {
+    return {
+      senderPhone_like: params.senderPhone_like || '',
+    };
+  }, [location.search]);
+
+  const [filters, setFilters] = useState(() => ({
+    ...queryParams,
+    senderPhone_like: '',
+  }));
 
   useEffect(() => {
     (async () => {
       try {
-        const respone = await transferReceiptsApi.getAll();
+        const respone = await transferReceiptsApi.getAll(queryParams);
         setData(respone);
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
     })();
-  }, [reLoad]);
+  }, [reLoad, queryParams]);
   const onView = (id) => {
     if (!handleView) return;
     handleView(id);
@@ -40,12 +57,40 @@ function BillTable({ reLoad = false, handleDelete = null, handleEdit = null, han
     if (!onEdit) return;
     handleEdit(id, checked);
   };
+
+  const handleChange = (value) => {
+    setFilters((prev) => ({
+      ...prev,
+      senderPhone_like: value,
+    }));
+    const filters = {
+      ...queryParams,
+      senderPhone_like: value,
+    };
+
+    navigate({
+      pathname: location.pathname,
+      search: queryString.stringify(filters),
+    });
+  };
+  const handleReset = () => {
+    setFilters({});
+    const filters = {};
+    navigate({
+      pathname: location.pathname,
+      search: queryString.stringify(filters),
+    });
+  };
   return (
     <>
       <Row>
         <Col>
           <div className="search-footer">
-            <TextFieldBtn placeholder={'Nhập số điện thoại để tìm kiếm ...'} />
+            <TextFieldBtn
+              handleChange={handleChange}
+              handleReset={handleReset}
+              placeholder={'Nhập số điện thoại để tìm kiếm ...'}
+            />
             <Table responsive striped bordered hover className="table-normal">
               <thead>
                 <tr>
@@ -92,7 +137,7 @@ function BillTable({ reLoad = false, handleDelete = null, handleEdit = null, han
                     <td>
                       {formatPrice(item.paymentAmount)}
                       <br />
-                      {item.createdAt}
+                      {moment(item.createdAt).format('MM-DD-YYYY')}
                       <br />
                     </td>
                     <td>
