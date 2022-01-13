@@ -4,11 +4,20 @@
 
 .input-normal {
   select {
+    position: relative;
     option {
       padding: 0.375rem 0.75rem;
       font-size: 1rem;
       line-height: 1.5;
       color: #212529;
+      cursor: pointer;
     }
+  }
+  .select-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    z-index: 3;
+    transform: translateY(-50%);
   }
 }

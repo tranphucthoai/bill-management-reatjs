@@ -1,0 +1,12 @@
+.flex-space-20 {
+  margin: -20px;
+  > * {
+    padding: 20px;
+  }
+}
+
+.main-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

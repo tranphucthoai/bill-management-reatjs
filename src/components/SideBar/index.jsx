@@ -1,17 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './style.scss';
 import { Dropdown, Button } from 'react-bootstrap';
+import { useSelector, useDispatch } from 'react-redux';
+import branchsApi from './../../api/branchsApi';
+import { logout } from '../../features/login/loginSlice';
+import { useNavigate } from 'react-router-dom';
 
 function SideBar() {
+  const { userName } = useSelector((state) => state.loginUser);
+  const [user, setUser] = useState({});
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  useEffect(() => {
+    (async () => {
+      const respone = await branchsApi.get(userName);
+      setUser(respone);
+      console.log('respone', respone);
+    })();
+  }, [userName]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.setItem('userName', '');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
+  console.log('user', Object.keys(user));
+
   return (
     <aside className="sidebar">
       <div className="sidebar-inner">
-        <h3 className="sidebar__heading mb-4">
-          CÔNG TY TNHH DV VT TRƯỜNG THỌ
-          <br />
-          BƯU ĐIỆN - VIETTEL TRƯỜNG THỌ
-        </h3>
-
+        <h3 className="sidebar__heading mb-4">{user.name}</h3>
         <Dropdown className="sidebar__dropdown">
           <Dropdown.Toggle variant="success" id="dropdown-basic" className="btn-reset">
             Chọn loại hoá đơn
@@ -26,49 +48,55 @@ function SideBar() {
         </Dropdown>
 
         <p className="sidebar__thumb mb-4 mt-4">
-          <img src="https://via.placeholder.com/300.png" alt="" />
+          <img src={userName ? user.thumb : 'https://via.placeholder.com/300.png'} alt="" />
         </p>
 
-        <ul className="sidebar__info">
-          <li>
-            <i className="fa fa-map-marker"></i>
-            <p>
-              QL14 Ngã 3 Phú Hòa, KP Phú Hòa
-              <br />
-              P.Hòa Lợi, H.Bến Cát, T.Bình Dương
-            </p>
-          </li>
-          <li>
-            <i className="fa fa-phone"></i>
-            <p>Số điện thoại: 02746.222.999</p>
-          </li>
-          <li>
-            <i className="fa fa-mobile"></i>
-            <p>Hotline: 0977.87.78.77</p>
-          </li>
-          <li>
-            <i className="fa fa-user-circle"></i>
-            <p>Tư vấn viên: Lê Văn Trường</p>
-          </li>
-          <li>
-            <i className="fa fa-globe"></i>
-            <p>Website: http://hoadonbanhang.com</p>
-          </li>
-        </ul>
-
-        <div className="sidebar__action mt-4">
-          <Button className="mb-3" variant="danger">
-            Thoát Tài Khoản
-          </Button>
-          <ul>
+        {userName.length > 0 && (
+          <ul className="sidebar__info">
             <li>
-              <a href="">Về Trang Chủ</a>
+              <i className="fa fa-map-marker"></i>
+              <p>{user.address}</p>
             </li>
-            <li>|</li>
             <li>
-              <a href="">Đổi Mật Khẩu</a>
+              <i className="fa fa-phone"></i>
+              <p>Số điện thoại: {user.phone}</p>
+            </li>
+            <li>
+              <i className="fa fa-mobile"></i>
+              <p>Hotline: {user.hotline}</p>
+            </li>
+            <li>
+              <i className="fa fa-user-circle"></i>
+              <p>Tư vấn viên: {user.consultantName}</p>
+            </li>
+            <li>
+              <i className="fa fa-globe"></i>
+              <p>
+                Website: <a href={user.website}>{user.website}</a>
+              </p>
             </li>
           </ul>
+        )}
+
+        <div className="sidebar__action mt-4">
+          <Button
+            onClick={userName ? handleLogout : handleLogin}
+            className="mb-3"
+            variant={userName ? 'danger' : 'success'}
+          >
+            {userName ? 'Thoát Tài Khoản' : 'Đăng Nhập'}
+          </Button>
+          {userName.length > 0 && (
+            <ul>
+              <li>
+                <a href="">Về Trang Chủ</a>
+              </li>
+              <li>|</li>
+              <li>
+                <a href="">Đổi Mật Khẩu</a>
+              </li>
+            </ul>
+          )}
         </div>
       </div>
     </aside>

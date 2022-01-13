@@ -6,7 +6,6 @@ import './style.scss';
 TransfersBill.propTypes = {};
 
 function TransfersBill(props) {
-  localStorage.setItem('userID', 'ThaiBinhDuong');
   return (
     <section className="main-col">
       <Row>
