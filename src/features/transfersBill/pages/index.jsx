@@ -3,9 +3,9 @@ import { Col, Row } from 'react-bootstrap';
 import BillForm from '../components/billForm';
 import './style.scss';
 
-TransfersBill.propTypes = {};
+TransferBill.propTypes = {};
 
-function TransfersBill(props) {
+function TransferBill(props) {
   return (
     <section className="main-col">
       <Row>
@@ -17,4 +17,4 @@ function TransfersBill(props) {
   );
 }
 
-export default TransfersBill;
+export default TransferBill;
