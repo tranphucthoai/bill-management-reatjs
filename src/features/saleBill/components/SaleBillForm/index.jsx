@@ -10,15 +10,17 @@ import SelectField from '../../../../components/formControls/SelectField';
 import TextField from '../../../../components/formControls/TextField/index';
 import { create, edit } from '../../salesBillSlice';
 import SaleBillTable from '../SaleBillTable/index';
+import saleCatalogApi from './../../../../api/saleCatalogApi';
 
 SaleBillForm.propTypes = {};
 
 function SaleBillForm(props) {
   const [reLoad, setReload] = useState(false);
-  const [paymentsSelected, setPaymentsSelected] = useState(0);
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.saleBill);
+  const [saleCatalogs, setSaleCatalogs] = useState([]);
+  const [selectVal, setSelectVal] = useState('CardViettle');
 
   //call api load data table
 
@@ -35,55 +37,36 @@ function SaleBillForm(props) {
   //init formik
 
   const initValForm = {
-    senderPhone: '',
-    senderName: '',
-    senderCardId: '',
-    senderAddress: '',
-    receiverPhone: '',
-    receiverName: '',
-    receiverCardId: '',
-    receiverAddress: '',
-    bankPlusPhone: '',
-    transferAmount: '',
-    transferFee: '',
-    accountNumber: '',
-    paymentAmount: '',
+    phone: '',
+    name: '',
+    address: '',
+    productNumber: '',
+    quantity: '',
+    price: '',
   };
 
   const formik = useFormik({
     initialValues: initValForm,
     validationSchema: Yup.object({
-      senderPhone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
-      senderName: Yup.string().min(5, 'Vui lòng nhập họ và tên').required('Vui lòng nhập họ và tên'),
-      senderCardId: Yup.number()
-        .min(13, 'Số CMND / Hộ chiếu ít nhất 13 chữ số')
-        .required('Vui lòng nhập số CMND / Hộ chiếu'),
-      senderAddress: Yup.string().required('Vui lòng nhập địa chỉ'),
-      receiverPhone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
-      receiverName: Yup.string().min(5, 'Vui lòng nhập họ và tên').required('Vui lòng nhập họ và tên'),
-      receiverCardId: Yup.number()
-        .min(13, 'Số CMND / Hộ chiếu ít nhất 13 chữ số')
-        .required('Vui lòng nhập số CMND / Hộ chiếu'),
-      receiverAddress: Yup.string().required('Vui lòng nhập địa chỉ'),
-
-      bankPlusPhone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
-      transferAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
-      transferFee: Yup.number().required('Vui lòng nhập lệ phí'),
-      accountNumber: Yup.number()
-        .min(10, 'Vui lòng nhập Số tài khoản / Số thẻ')
-        .required('Vui lòng nhập Số tài khoản / Số thẻ'),
+      phone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
+      name: Yup.string().min(5, 'Vui lòng nhập họ và tên').required('Vui lòng nhập họ và tên'),
+      address: Yup.string().required('Vui lòng nhập địa chỉ'),
+      productNumber: Yup.string().min(4, 'Mã số ít nhất 4 kí tự').required('Vui lòng nhập mã số'),
+      quantity: Yup.number()
+        .required('Vui lòng nhập số lượng')
+        .moreThan(0, 'Số lượng lớn hơn không')
+        .integer('Số lượng là số nguyên'),
+      price: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
     }),
     onSubmit: async (values) => {
-      values.paymentAmount = values.transferAmount - values.transferFee;
-      values.formOfReceipt = paymentsSelected;
+      values.paymentAmount = values.quantity * values.price;
       values.status = statusSelected;
       values.branchId = localStorage.getItem('userID');
       values.isCheckDelete = true;
-      values.createdBy = '';
-      values.senderCardIdDateOfIssue = 0;
-      values.senderCardIdPlaceOfIssue = values.senderAddress;
-      values.receiverCardIdDateOfIssue = 0;
-      values.receiverCardIdPlaceOfIssue = values.receiverAddress;
+      values.saleCatalogId = selectVal;
+
+      console.log('selectValselectVal', selectVal);
+
       if (isUpdate) {
         const respone = await saleReceiptsApi.update(idItem, values);
       } else {
@@ -96,28 +79,6 @@ function SaleBillForm(props) {
   });
 
   //init values (status or form payments)
-
-  const [formOfReceipt, setFormOfReceipt] = useState([
-    {
-      id: 0,
-      name: 'home',
-      text: 'Tại nhà',
-      isChecked: true,
-    },
-    {
-      id: 1,
-      name: 'office',
-      text: 'Văn phòng',
-      isChecked: false,
-    },
-    {
-      id: 2,
-      name: 'banking',
-      text: 'Chuyển khoản',
-      isChecked: false,
-    },
-  ]);
-
   const [status, setStatus] = useState([
     {
       id: 0,
@@ -145,16 +106,6 @@ function SaleBillForm(props) {
         }))
       );
       setStatusSelected(index);
-    }
-    if (nameGroup === 'formPayments') {
-      const newFormOfReceipt = [...formOfReceipt];
-      setFormOfReceipt(
-        newFormOfReceipt.map((item = 0, indexItem) => ({
-          ...item,
-          isChecked: index === indexItem ? true : false,
-        }))
-      );
-      setPaymentsSelected(index);
     }
   };
 
@@ -189,21 +140,18 @@ function SaleBillForm(props) {
     (async () => {
       try {
         const fillVal = await saleReceiptsApi.get(idItem);
+        console.log('fillVal', fillVal);
 
         formik.setValues(
           {
-            senderPhone: fillVal.senderPhone,
-            senderName: fillVal.senderName,
-            senderCardId: fillVal.senderCardId,
-            senderAddress: fillVal.senderAddress,
-            receiverPhone: fillVal.receiverPhone,
-            receiverName: fillVal.receiverName,
-            receiverCardId: fillVal.receiverCardId,
-            receiverAddress: fillVal.receiverAddress,
-            bankPlusPhone: fillVal.bankPlusPhone,
-            transferAmount: fillVal.transferAmount,
-            transferFee: fillVal.transferFee,
-            accountNumber: fillVal.accountNumber,
+            phone: fillVal.phone,
+            name: fillVal.name,
+            address: fillVal.address,
+
+            productNumber: fillVal.productNumber,
+            quantity: fillVal.quantity,
+            price: fillVal.price,
+
             paymentAmount: fillVal.paymentAmount,
             paymentAmountText: VNnum2words(fillVal.paymentAmount),
           },
@@ -223,9 +171,8 @@ function SaleBillForm(props) {
             isChecked: !fillVal.status,
           },
         ];
-
+        setSelectVal(fillVal.saleCatalogId);
         handleSelectedItem(fillVal.status, 'status');
-        handleSelectedItem(fillVal.formOfReceipt, 'formPayments');
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
@@ -271,10 +218,22 @@ function SaleBillForm(props) {
     // console.log('e.target.value', e.target.value);
   };
 
-  const handleChangeSelect = () => {};
+  const handleChangeSelect = (value) => {
+    setSelectVal(value);
+  };
+  //call api catalog products
 
-  const [branchs, setBranchs] = useState([]);
-  const [selectVal, setSelectVal] = useState('TruongTho');
+  useEffect(() => {
+    (async () => {
+      try {
+        const respone = await saleCatalogApi.getAll();
+        setSaleCatalogs(respone);
+      } catch (error) {
+        console.log('Failed to fetch Api', error);
+      }
+    })();
+  }, []);
+
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -293,9 +252,9 @@ function SaleBillForm(props) {
         <Row>
           <Col md={6}>
             <h4 className="main-col__title">Thông tin khách gửi</h4>
-            <TextField form={formik} type="number" name="userPhone" icon={'fa-phone'} placeholder={'Nhập điện thoại'} />
-            <TextField form={formik} name="userName" icon={'fa-user-o'} placeholder={'Họ và tên'} />
-            <TextField form={formik} name="userAddress" icon={'fa-map-marker'} placeholder={'Địa chỉ'} />
+            <TextField form={formik} type="number" name="phone" icon={'fa-phone'} placeholder={'Nhập điện thoại'} />
+            <TextField form={formik} name="name" icon={'fa-user-o'} placeholder={'Họ và tên'} />
+            <TextField form={formik} name="address" icon={'fa-map-marker'} placeholder={'Địa chỉ'} />
           </Col>
           <Col md={6}>
             <h4 className="main-col__title">Thông tin sản phẩm</h4>
@@ -304,7 +263,7 @@ function SaleBillForm(props) {
               handleChange={handleChangeSelect}
               name="selectUser"
               icon="fa-folder-open"
-              data={branchs}
+              data={saleCatalogs}
               selectVal={selectVal}
             />
             <TextField form={formik} name="productNumber" icon={'fa-barcode'} placeholder={'Mã số sản phẩm (nếu có)'} />

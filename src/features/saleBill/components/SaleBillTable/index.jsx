@@ -123,12 +123,12 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
                       <br />
                       {item.productNumber}
                       <br />
-                      {item.createdAt}
+                      {moment(item.createdAt).format('MM-DD-YYYY')}
                     </td>
                     <td>
-                      {item.quantity} x {item.price}
+                      {item.quantity} x {formatPrice(item.price)}
                     </td>
-                    <td>{Number.parseInt(item.price) * Number.parseInt(item.quantity)}</td>
+                    <td>{formatPrice(Number.parseInt(item.price) * Number.parseInt(item.quantity))}</td>
                     <td>
                       <div className="box-status">
                         <input
