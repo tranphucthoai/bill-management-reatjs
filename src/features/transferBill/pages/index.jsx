@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
-import BillForm from '../components/billForm';
+import TransferBillForm from '../components/TransferBillForm/index';
 import './style.scss';
 
 TransferBill.propTypes = {};
@@ -10,7 +10,7 @@ function TransferBill(props) {
     <section className="main-col">
       <Row>
         <Col xs={12}>
-          <BillForm />
+          <TransferBillForm />
         </Col>
       </Row>
     </section>

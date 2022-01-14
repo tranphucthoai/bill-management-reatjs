@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import transfersBillReducer from '../features/transfersBill/transfersBillSlice';
+import transferBillReducer from '../features/transferBill/transferBillSlice';
+import saleBillReducer from '../features/saleBill/salesBillSlice';
 import loginUser from '../features/login/loginSlice';
 
 const rootReducer = {
-  transfersBill: transfersBillReducer,
+  transferBill: transferBillReducer,
+  saleBill: saleBillReducer,
   loginUser: loginUser,
 };
 

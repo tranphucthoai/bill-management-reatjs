@@ -17,7 +17,7 @@ function SelectField({ icon = '', form = {}, name = '', data = [], handleChange 
     handleChange(e.target.value);
   };
   return (
-    <InputGroup hasValidation className="input-normal mb-3">
+    <InputGroup hasValidation className={clsx('input-normal', !!form.errors[name] ? 'mb-2' : 'mb-4')}>
       <InputGroup.Text className="input-group-text">
         <i className={clsx('fa', icon)}></i>
       </InputGroup.Text>

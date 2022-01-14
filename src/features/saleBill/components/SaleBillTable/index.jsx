@@ -1,16 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
-import TextFieldBtn from './../../../../components/formControls/TextFieldBtn/index';
+import { useLocation, useNavigate } from 'react-router-dom';
+import saleReceiptsApi from '../../../../api/saleReceiptsApi';
+import TextFieldBtn from '../../../../components/formControls/TextFieldBtn/index';
+import { formatPrice } from './../../../../constans/common';
+import propTypes from 'prop-types';
+import queryString from 'query-string';
+import moment from 'moment';
 
-index.propTypes = {
+SaleBillTable.propTypes = {
   reLoad: propTypes.bool,
   handleDelete: propTypes.func,
   handleEdit: propTypes.func,
   handleView: propTypes.func,
 };
 
-function index({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
+function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,19 +23,20 @@ function index({ reLoad = false, handleDelete = null, handleEdit = null, handleV
 
   const queryParams = useMemo(() => {
     return {
-      senderPhone_like: params.senderPhone_like || '',
+      phone_like: params.phone_like || '',
     };
   }, [location.search]);
 
   const [filters, setFilters] = useState(() => ({
     ...queryParams,
-    senderPhone_like: '',
+    phone_like: '',
   }));
 
   useEffect(() => {
     (async () => {
       try {
-        const respone = await transferReceiptsApi.getAll(queryParams);
+        const respone = await saleReceiptsApi.getAll(queryParams);
+        console.log('respone ok', respone);
         setData(respone);
       } catch (error) {
         console.log('Failed to fetch api', error);
@@ -51,15 +57,14 @@ function index({ reLoad = false, handleDelete = null, handleEdit = null, handleV
     if (!onEdit) return;
     handleEdit(id, checked);
   };
-
   const handleChange = (value) => {
     setFilters((prev) => ({
       ...prev,
-      senderPhone_like: value,
+      phone_like: value,
     }));
     const filters = {
       ...queryParams,
-      senderPhone_like: value,
+      phone_like: value,
     };
 
     navigate({
@@ -89,18 +94,15 @@ function index({ reLoad = false, handleDelete = null, handleEdit = null, handleV
               <thead>
                 <tr>
                   <th>STT</th>
-                  <th>Thông tin khách gửi</th>
-                  <th>Thông tin khách nhận</th>
+                  <th>Thông tin khách</th>
                   <th>
-                    Số tiền nhận
-                    <br />
-                    Lệ phí
+                    Loại sản phẩm <br /> Mã số sản phẩm <br /> Ngày bán
                   </th>
                   <th>
-                    Tổng tiền
-                    <br />
-                    Ngày nhận
+                    Số lượng <br />
+                    Đơn giá
                   </th>
+                  <th>Tổng tiền</th>
                   <th>Đã xử lý</th>
                   <th>Tác vụ</th>
                 </tr>
@@ -110,30 +112,23 @@ function index({ reLoad = false, handleDelete = null, handleEdit = null, handleV
                   <tr key={item.id}>
                     <td>{index + 1}</td>
                     <td>
-                      {item.senderName}
+                      {item.name}
                       <br />
-                      {item.senderPhone} <br />
-                      {item.senderAddress}
+                      {item.phone}
+                      <br />
+                      {item.address}
                     </td>
                     <td>
-                      {item.receiverName}
+                      {item.saleCatalogId}
                       <br />
-                      {item.receiverPhone}
+                      {item.productNumber}
                       <br />
-                      {item.receiverAddress}
+                      {item.createdAt}
                     </td>
                     <td>
-                      {formatPrice(item.transferAmount)}
-                      <br />
-                      {formatPrice(item.transferFee)}
-                      <br />
+                      {item.quantity} x {item.price}
                     </td>
-                    <td>
-                      {formatPrice(item.paymentAmount)}
-                      <br />
-                      {moment(item.createdAt).format('MM-DD-YYYY')}
-                      <br />
-                    </td>
+                    <td>{Number.parseInt(item.price) * Number.parseInt(item.quantity)}</td>
                     <td>
                       <div className="box-status">
                         <input
@@ -174,4 +169,4 @@ function index({ reLoad = false, handleDelete = null, handleEdit = null, handleV
   );
 }
 
-export default index;
+export default SaleBillTable;

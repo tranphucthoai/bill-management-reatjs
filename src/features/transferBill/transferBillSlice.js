@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const transfersBillSlice = createSlice({
-  name: 'transfersBill',
+const transferBillSlice = createSlice({
+  name: 'transferBill',
   initialState: {
     isUpdate: false,
     idItem: '',
@@ -22,6 +22,6 @@ const transfersBillSlice = createSlice({
   },
 });
 
-const { actions, reducer } = transfersBillSlice;
+const { actions, reducer } = transferBillSlice;
 export const { edit, create } = actions;
 export default reducer;

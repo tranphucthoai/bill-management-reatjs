@@ -11,28 +11,28 @@ function Home(props) {
     {
       id: 1,
       title: 'Hoá Đơn Bán Hàng',
-      url: '/salesBill',
+      url: '/saleBill',
       thumb:
         'https://res.cloudinary.com/dhyime7g0/image/upload/v1641024229/samples/bill-management/HoaDonBanHang_olfggh.jpg',
     },
     {
       id: 2,
       title: 'Hoá Đơn Thu Hộ',
-      url: '/receiptsBill',
+      url: '/receiptBill',
       thumb:
         'https://res.cloudinary.com/dhyime7g0/image/upload/v1641024230/samples/bill-management/HoaDonThuHo_rpwm1e.jpg',
     },
     {
       id: 3,
       title: 'Hoá Đơn Chuyển Tiền',
-      url: '/transfersBill',
+      url: '/transferBill',
       thumb:
         'https://res.cloudinary.com/dhyime7g0/image/upload/v1641024229/samples/bill-management/HoaDonChuyenTien_oehllu.jpg',
     },
     {
       id: 4,
       title: 'Hoá Đơn Nhận Tiền',
-      url: '/receiptsBill',
+      url: '/receiptBill',
       thumb:
         'https://res.cloudinary.com/dhyime7g0/image/upload/v1641024230/samples/bill-management/HoaDonNhanTien_mhn8op.png',
     },

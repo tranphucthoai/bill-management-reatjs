@@ -15,7 +15,7 @@ function SideBar() {
     (async () => {
       const respone = await branchsApi.get(userName);
       setUser(respone);
-      console.log('respone', respone);
+      // console.log('respone', respone);
     })();
   }, [userName]);
 
@@ -28,7 +28,7 @@ function SideBar() {
     navigate('/login');
   };
 
-  console.log('user', Object.keys(user));
+  // console.log('user', Object.keys(user));
 
   return (
     <aside className="sidebar">

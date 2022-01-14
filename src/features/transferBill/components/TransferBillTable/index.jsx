@@ -8,14 +8,14 @@ import transferReceiptsApi from '../../../../api/transferReceiptsApi';
 import TextFieldBtn from './../../../../components/formControls/TextFieldBtn/index';
 import { formatPrice } from './../../../../constans/common';
 
-BillTable.propTypes = {
+TransferBillTable.propTypes = {
   reLoad: propTypes.bool,
   handleDelete: propTypes.func,
   handleEdit: propTypes.func,
   handleView: propTypes.func,
 };
 
-function BillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
+function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -179,4 +179,4 @@ function BillTable({ reLoad = false, handleDelete = null, handleEdit = null, han
   );
 }
 
-export default BillTable;
+export default TransferBillTable;

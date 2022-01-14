@@ -6,7 +6,8 @@ import './app.scss';
 import SideBar from './components/SideBar';
 import Home from './features/home/pages';
 import Login from './features/login/pages';
-import TransfersBill from './features/transfersBill/pages';
+import TransferBill from './features/transferBill/pages';
+import SaleBill from './features/saleBill/pages/index';
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
               <Route path="/" element={<Login />} />
               <Route path="/login" element={<Login />} />
               <Route path="/home" element={<Home />} />
-              <Route path="/transfersBill" element={<TransfersBill />} />
+              <Route path="/transferBill" element={<TransferBill />} />
+              <Route path="/saleBill" element={<SaleBill />} />
             </Routes>
           </Col>
         </Row>

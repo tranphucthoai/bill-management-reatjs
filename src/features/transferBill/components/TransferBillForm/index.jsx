@@ -1,22 +1,21 @@
 import { useFormik } from 'formik';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import { number } from 'yup/lib/locale';
 import transferReceiptsApi from '../../../../api/transferReceiptsApi';
-import { create, edit } from '../../transfersBillSlice';
-import RadioGroup from './../../../../components/formControls/RadioGroup/index';
-import TextField from './../../../../components/formControls/TextField/index';
-import BillTable from './../billTable/index';
+import RadioGroup from '../../../../components/formControls/RadioGroup/index';
+import TextField from '../../../../components/formControls/TextField/index';
+import { create, edit } from '../../transferBillSlice';
+import TransferBillTable from './../TransferBillTable/index';
 
-function BillForm() {
+function TransferBillForm() {
   const [reLoad, setReload] = useState(false);
   const [paymentsSelected, setPaymentsSelected] = useState(0);
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
-  const { isUpdate, idItem } = useSelector((state) => state.transfersBill);
+  const { isUpdate, idItem } = useSelector((state) => state.transferBill);
 
   //call api load data table
 
@@ -406,9 +405,9 @@ function BillForm() {
           </Col>
         </Row>
       </form>
-      <BillTable handleEdit={handleEdit} handleDelete={handleDelete} handleView={handleView} reLoad={reLoad} />
+      <TransferBillTable handleEdit={handleEdit} handleDelete={handleDelete} handleView={handleView} reLoad={reLoad} />
     </>
   );
 }
 
-export default BillForm;
+export default TransferBillForm;

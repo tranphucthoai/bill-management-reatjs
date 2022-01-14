@@ -1,10 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { Col, Row } from 'react-bootstrap';
+import SaleBillForm from '../components/SaleBillForm/index';
 
-SalesBill.propTypes = {};
+SaleBill.propTypes = {};
 
-function SalesBill(props) {
-  return <div></div>;
+function SaleBill(props) {
+  return (
+    <section className="main-col">
+      <Row>
+        <Col xs={12}>
+          <SaleBillForm />
+        </Col>
+      </Row>
+    </section>
+  );
 }
 
-export default SalesBill;
+export default SaleBill;
