@@ -44,6 +44,7 @@ function CollectionBillForm(props) {
     serviceNumber: '',
     paymentAmount: '',
     timeForPayment: 0,
+    paymentAmountText: '',
   };
   const currentDate = new Date(Date.now()).toISOString().slice(0, 10);
 
@@ -57,6 +58,7 @@ function CollectionBillForm(props) {
       paymentAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
       timeForPayment: Yup.date().min(currentDate, 'Nhập thời hạn thanh toán'),
       // timeForPayment: Yup.date().max(new Date().toISOString().slice(0, 10), '???'),
+      paymentAmountText: Yup.string(),
     }),
     onSubmit: async (values) => {
       values.status = statusSelected;
@@ -72,7 +74,8 @@ function CollectionBillForm(props) {
 
       setReload((prev) => !prev);
       dispatch(create());
-      formik.resetForm();
+
+      resetForm();
     },
   });
 
@@ -112,9 +115,7 @@ function CollectionBillForm(props) {
   const handleAdd = () => {
     dispatch(edit(''));
     dispatch(create());
-    formik.resetForm();
-    setSelectVal(0);
-    handleSelectedItem(0, 'status');
+    resetForm();
   };
 
   //handleDelete
@@ -185,27 +186,17 @@ function CollectionBillForm(props) {
     dispatch(edit(id));
   };
 
+  //reset form
+  const resetForm = () => {
+    formik.resetForm();
+    setSelectVal(collectionCatalogs[0]);
+    handleSelectedItem(0, 'status');
+  };
   //scroll top
 
   useEffect(() => {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
-
-  const handleInputTransferFee = (e, valueTransferAmount, valueTransferFee) => {
-    if (valueTransferAmount) {
-      const newValue = valueTransferAmount - Number.parseInt(e.target.value);
-      formik.setValues(
-        {
-          paymentAmountText: VNnum2words(newValue),
-          paymentAmount: newValue,
-        },
-        false
-      );
-    }
-  };
-  const handleInputPaymentAmount = (e) => {
-    // console.log('e.target.value', e.target.value);
-  };
 
   const handleChangeSelect = (value) => {
     setSelectVal(value);
@@ -274,7 +265,6 @@ function CollectionBillForm(props) {
               name="paymentAmount"
               icon={'fa-pause'}
               placeholder={'Số tiền thanh toán'}
-              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
@@ -286,7 +276,6 @@ function CollectionBillForm(props) {
               name="paymentAmountText"
               icon={'fa-text-width'}
               placeholder={'Số tiền thanh toán bằng chữ'}
-              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
