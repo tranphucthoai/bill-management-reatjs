@@ -38,7 +38,7 @@ function TextField({
         value={form.values[name]}
         isInvalid={!!form.errors[name]}
         feedback={form.errors[name]}
-        feedbackType="invalid"
+        feedbacktype="invalid"
         id={name}
       />
       {form.errors[name] ? (

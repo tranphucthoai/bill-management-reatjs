@@ -126,7 +126,7 @@ function CollectionBillTable({ reLoad = false, handleDelete = null, handleEdit =
                       <br />
                       {item.serviceNumber}
                     </td>
-                    <td>{moment(item.createdAt).format('MM-DD-YYYY')}</td>
+                    <td>{moment(item.timeForPayment).format('MM-DD-YYYY')}</td>
                     <td>{formatPrice(Number.parseInt(item.paymentAmount))}</td>
                     <td>
                       <div className="box-status">

@@ -20,7 +20,7 @@ function CollectionBillForm(props) {
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.collectionBill);
   const [collectionCatalogs, setCollectionCatalogs] = useState([]);
-  const [selectVal, setSelectVal] = useState('CardViettle');
+  const [selectVal, setSelectVal] = useState('');
 
   //call api load data table
 
@@ -40,11 +40,12 @@ function CollectionBillForm(props) {
     phone: '',
     name: '',
     address: '',
-    productNumber: '',
-    quantity: '',
     price: '',
     serviceNumber: '',
+    paymentAmount: '',
+    timeForPayment: 0,
   };
+  const currentDate = new Date(Date.now()).toISOString().slice(0, 10);
 
   const formik = useFormik({
     initialValues: initValForm,
@@ -52,14 +53,10 @@ function CollectionBillForm(props) {
       phone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
       name: Yup.string().min(5, 'Vui lòng nhập họ và tên').required('Vui lòng nhập họ và tên'),
       address: Yup.string().required('Vui lòng nhập địa chỉ'),
-      productNumber: Yup.string().min(4, 'Mã số ít nhất 4 kí tự').required('Vui lòng nhập mã số'),
-      quantity: Yup.number()
-        .required('Vui lòng nhập số lượng')
-        .moreThan(0, 'Số lượng lớn hơn không')
-        .integer('Số lượng là số nguyên'),
-      price: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
       serviceNumber: Yup.string().min(4, 'Vui lòng nhập hơn 4 kí tự').required('Vui lòng nhập số hợp đồng'),
       paymentAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
+      timeForPayment: Yup.date().min(currentDate, 'Nhập thời hạn thanh toán'),
+      // timeForPayment: Yup.date().max(new Date().toISOString().slice(0, 10), '???'),
     }),
     onSubmit: async (values) => {
       values.status = statusSelected;
@@ -72,6 +69,7 @@ function CollectionBillForm(props) {
       } else {
         const respone = await collectionReceiptsApi.add(values);
       }
+
       setReload((prev) => !prev);
       dispatch(create());
       formik.resetForm();
@@ -115,6 +113,8 @@ function CollectionBillForm(props) {
     dispatch(edit(''));
     dispatch(create());
     formik.resetForm();
+    setSelectVal(0);
+    handleSelectedItem(0, 'status');
   };
 
   //handleDelete
@@ -151,11 +151,11 @@ function CollectionBillForm(props) {
             name: fillVal.name,
             address: fillVal.address,
 
-            quantity: fillVal.quantity,
-            price: fillVal.price,
+            // timeForPayment: fillVal.timeForPayment === 0 ? Date().toISOString().subStr(0, 10) : fillVal.timeForPayment,
+            timeForPayment: fillVal.timeForPayment,
 
             paymentAmount: fillVal.paymentAmount,
-            paymentAmountText: VNnum2words(fillVal.paymentAmount),
+            paymentAmountText: VNnum2words(fillVal.paymentAmount).trim() + ' đồng',
           },
           true
         );
@@ -253,7 +253,7 @@ function CollectionBillForm(props) {
             <TextField
               form={formik}
               type="date"
-              name="paymentTime"
+              name="timeForPayment"
               icon={'fa-calendar'}
               placeholder={'Kì hạn thanh toán'}
             />
@@ -269,7 +269,6 @@ function CollectionBillForm(props) {
           <Col>
             <h4 className="main-col__title">Thông tin khách gửi</h4>
             <TextField
-              readOnly={true}
               type="number"
               form={formik}
               name="paymentAmount"
