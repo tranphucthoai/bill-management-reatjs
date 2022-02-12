@@ -4,22 +4,22 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import saleReceiptsApi from '../../../../api/saleReceiptsApi';
+import collectionReceiptsApi from '../../../../api/collectionReceiptsApi';
 import RadioGroup from '../../../../components/formControls/RadioGroup/index';
 import SelectField from '../../../../components/formControls/SelectField';
 import TextField from '../../../../components/formControls/TextField/index';
-import { create, edit } from '../../salesBillSlice';
-import SaleBillTable from '../SaleBillTable/index';
-import saleCatalogApi from './../../../../api/saleCatalogApi';
+import { create, edit } from '../../collectionBillSlice';
+import CollectionBillTable from './../collectionBillTable/index';
+import collectionCatalogApi from './../../../../api/collectionCatalogApi';
 
-SaleBillForm.propTypes = {};
+CollectionBillForm.propTypes = {};
 
-function SaleBillForm(props) {
+function CollectionBillForm(props) {
   const [reLoad, setReload] = useState(false);
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
-  const { isUpdate, idItem } = useSelector((state) => state.saleBill);
-  const [saleCatalogs, setSaleCatalogs] = useState([]);
+  const { isUpdate, idItem } = useSelector((state) => state.collectionBill);
+  const [collectionCatalogs, setCollectionCatalogs] = useState([]);
   const [selectVal, setSelectVal] = useState('CardViettle');
 
   //call api load data table
@@ -27,7 +27,7 @@ function SaleBillForm(props) {
   // useEffect(() => {
   //   (async () => {
   //     try {
-  //       const respone = await saleReceiptsApi.get('ok');
+  //       const respone = await collectionReceiptsApi.get('');
   //     } catch (error) {
   //       console.log('Failed to fetch Api', error);
   //     }
@@ -43,6 +43,7 @@ function SaleBillForm(props) {
     productNumber: '',
     quantity: '',
     price: '',
+    serviceNumber: '',
   };
 
   const formik = useFormik({
@@ -57,20 +58,19 @@ function SaleBillForm(props) {
         .moreThan(0, 'Số lượng lớn hơn không')
         .integer('Số lượng là số nguyên'),
       price: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
+      serviceNumber: Yup.string().min(4, 'Vui lòng nhập hơn 4 kí tự').required('Vui lòng nhập số hợp đồng'),
+      paymentAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
     }),
     onSubmit: async (values) => {
-      values.paymentAmount = values.quantity * values.price;
       values.status = statusSelected;
       values.branchId = localStorage.getItem('userID');
       values.isCheckDelete = true;
-      values.saleCatalogId = selectVal;
-
-      console.log('selectValselectVal', selectVal);
+      values.collectionCatalogId = selectVal;
 
       if (isUpdate) {
-        const respone = await saleReceiptsApi.update(idItem, values);
+        const respone = await collectionReceiptsApi.update(idItem, values);
       } else {
-        const respone = await saleReceiptsApi.add(values);
+        const respone = await collectionReceiptsApi.add(values);
       }
       setReload((prev) => !prev);
       dispatch(create());
@@ -112,6 +112,7 @@ function SaleBillForm(props) {
   //handleAdd
 
   const handleAdd = () => {
+    dispatch(edit(''));
     dispatch(create());
     formik.resetForm();
   };
@@ -119,7 +120,7 @@ function SaleBillForm(props) {
   //handleDelete
 
   const handleDelete = async (id) => {
-    const respone = await saleReceiptsApi.remove(id);
+    const respone = await collectionReceiptsApi.remove(id);
     setReload((prev) => !prev);
 
     if (id === idItem) {
@@ -129,7 +130,7 @@ function SaleBillForm(props) {
   //handleEdit
 
   const handleEdit = async (id, checked) => {
-    const respone = await saleReceiptsApi.update(id, {
+    const respone = await collectionReceiptsApi.update(id, {
       status: checked,
     });
     setReload((prev) => !prev);
@@ -139,16 +140,17 @@ function SaleBillForm(props) {
   useEffect(() => {
     (async () => {
       try {
-        const fillVal = await saleReceiptsApi.get(idItem);
+        const fillVal = await collectionReceiptsApi.get(idItem);
         console.log('fillVal', fillVal);
 
         formik.setValues(
           {
+            serviceNumber: fillVal.serviceNumber,
+
             phone: fillVal.phone,
             name: fillVal.name,
             address: fillVal.address,
 
-            productNumber: fillVal.productNumber,
             quantity: fillVal.quantity,
             price: fillVal.price,
 
@@ -171,7 +173,7 @@ function SaleBillForm(props) {
             isChecked: !fillVal.status,
           },
         ];
-        setSelectVal(fillVal.saleCatalogId);
+        setSelectVal(fillVal.collectionCatalogId);
         handleSelectedItem(fillVal.status, 'status');
       } catch (error) {
         console.log('Failed to fetch api', error);
@@ -180,7 +182,6 @@ function SaleBillForm(props) {
   }, [idItem]);
 
   const handleView = (id) => {
-    dispatch(edit(''));
     dispatch(edit(id));
   };
 
@@ -190,18 +191,6 @@ function SaleBillForm(props) {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
 
-  // const handleInputTransferAmount = (e, valueTransferAmount, valueTransferFee) => {
-  //   if (valueTransferFee) {
-  //     const newValue = Number.parseInt(e.target.value) - valueTransferFee;
-  //     formik.setValues(
-  //       {
-  //         paymentAmountText: VNnum2words(newValue),
-  //         paymentAmount: newValue,
-  //       },
-  //       false
-  //     );
-  //   }
-  // };
   const handleInputTransferFee = (e, valueTransferAmount, valueTransferFee) => {
     if (valueTransferAmount) {
       const newValue = valueTransferAmount - Number.parseInt(e.target.value);
@@ -226,8 +215,8 @@ function SaleBillForm(props) {
   useEffect(() => {
     (async () => {
       try {
-        const respone = await saleCatalogApi.getAll();
-        setSaleCatalogs(respone);
+        const respone = await collectionCatalogApi.getAll();
+        setCollectionCatalogs(respone);
       } catch (error) {
         console.log('Failed to fetch Api', error);
       }
@@ -240,7 +229,7 @@ function SaleBillForm(props) {
         <Row>
           <Col xs={12}>
             <div className="main-col__box d-flex justify-content-between">
-              <h2 className="main-col__heading">Hóa đơn bán hàng</h2>
+              <h2 className="main-col__heading">Hóa đơn thu hộ</h2>
               <div className="btn-group">
                 <a onClick={handleAdd} className="ms-auto btn-reset bg-yellow color-blue btn btn-md">
                   <i className="fa fa-plus"></i>
@@ -251,30 +240,29 @@ function SaleBillForm(props) {
         </Row>
         <Row>
           <Col md={6}>
-            <h4 className="main-col__title">Thông tin khách gửi</h4>
-            <TextField form={formik} type="number" name="phone" icon={'fa-phone'} placeholder={'Nhập điện thoại'} />
-            <TextField form={formik} name="name" icon={'fa-user-o'} placeholder={'Họ và tên'} />
-            <TextField form={formik} name="address" icon={'fa-map-marker'} placeholder={'Địa chỉ'} />
-          </Col>
-          <Col md={6}>
-            <h4 className="main-col__title">Thông tin sản phẩm</h4>
+            <h4 className="main-col__title">Thông tin dịch vụ thu hộ</h4>
+            <TextField form={formik} name="serviceNumber" icon={'fa-id-badge'} placeholder={'Số hợp đồng'} />
             <SelectField
               form={formik}
               handleChange={handleChangeSelect}
-              name="selectUser"
+              name="collectionCatalogId"
               icon="fa-folder-open"
-              data={saleCatalogs}
+              data={collectionCatalogs}
               selectVal={selectVal}
             />
-            <TextField form={formik} name="productNumber" icon={'fa-barcode'} placeholder={'Mã số sản phẩm (nếu có)'} />
-            <Row>
-              <Col md={6}>
-                <TextField form={formik} name="quantity" icon={'fa-calculator'} placeholder={'Số lượng'} />
-              </Col>
-              <Col md={6}>
-                <TextField form={formik} name="price" icon={'fa-money'} placeholder={'Đơn giá'} />
-              </Col>
-            </Row>
+            <TextField
+              form={formik}
+              type="date"
+              name="paymentTime"
+              icon={'fa-calendar'}
+              placeholder={'Kì hạn thanh toán'}
+            />
+          </Col>
+          <Col md={6}>
+            <h4 className="main-col__title">Thông tin khách nộp tiền</h4>
+            <TextField form={formik} type="number" name="phone" icon={'fa-phone'} placeholder={'Nhập điện thoại'} />
+            <TextField form={formik} name="name" icon={'fa-user-o'} placeholder={'Họ và tên'} />
+            <TextField form={formik} name="address" icon={'fa-map-marker'} placeholder={'Địa chỉ'} />
           </Col>
         </Row>
         <Row>
@@ -318,9 +306,13 @@ function SaleBillForm(props) {
           </Col>
         </Row>
       </form>
-      <SaleBillTable handleEdit={handleEdit} handleDelete={handleDelete} handleView={handleView} reLoad={reLoad} />
+      <CollectionBillTable
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        handleView={handleView}
+        reLoad={reLoad}
+      />
     </>
   );
 }
-
-export default SaleBillForm;
+export default CollectionBillForm;

@@ -19,15 +19,15 @@ function TransferBillForm() {
 
   //call api load data table
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const respone = await transferReceiptsApi.get('ok');
-      } catch (error) {
-        console.log('Failed to fetch Api', error);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const respone = await transferReceiptsApi.get('ok');
+  //     } catch (error) {
+  //       console.log('Failed to fetch Api', error);
+  //     }
+  //   })();
+  // }, []);
 
   //init formik
 

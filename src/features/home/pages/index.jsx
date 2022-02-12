@@ -18,7 +18,7 @@ function Home(props) {
     {
       id: 2,
       title: 'Hoá Đơn Thu Hộ',
-      url: '/receiptBill',
+      url: '/collectionBill',
       thumb:
         'https://res.cloudinary.com/dhyime7g0/image/upload/v1641024230/samples/bill-management/HoaDonThuHo_rpwm1e.jpg',
     },

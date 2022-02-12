@@ -8,6 +8,7 @@ import Home from './features/home/pages';
 import Login from './features/login/pages';
 import TransferBill from './features/transferBill/pages';
 import SaleBill from './features/saleBill/pages/index';
+import CollectionBill from './features/collectionBill/pages/index';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/transferBill" element={<TransferBill />} />
               <Route path="/saleBill" element={<SaleBill />} />
+              <Route path="/collectionBill" element={<CollectionBill />} />
             </Routes>
           </Col>
         </Row>
