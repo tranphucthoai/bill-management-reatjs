@@ -32,7 +32,7 @@ function Home(props) {
     {
       id: 4,
       title: 'Hoá Đơn Nhận Tiền',
-      url: '/receiptBill',
+      url: '/receiveBill',
       thumb:
         'https://res.cloudinary.com/dhyime7g0/image/upload/v1641024230/samples/bill-management/HoaDonNhanTien_mhn8op.png',
     },

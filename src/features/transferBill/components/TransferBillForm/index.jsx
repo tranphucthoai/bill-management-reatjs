@@ -16,19 +16,6 @@ function TransferBillForm() {
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.transferBill);
-
-  //call api load data table
-
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const respone = await transferReceiptsApi.get('ok');
-  //     } catch (error) {
-  //       console.log('Failed to fetch Api', error);
-  //     }
-  //   })();
-  // }, []);
-
   //init formik
 
   const initValForm = {

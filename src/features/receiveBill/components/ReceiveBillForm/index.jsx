@@ -17,9 +17,9 @@ ReceiveBillForm.propTypes = {};
 function ReceiveBillForm(props) {
   const [reLoad, setReload] = useState(false);
   const [statusSelected, setStatusSelected] = useState(0);
+  const [paymentsSelected, setPaymentsSelected] = useState(0);
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.receiveBill);
-  const [saleCatalogs, setSaleCatalogs] = useState([]);
   const [selectVal, setSelectVal] = useState('');
 
   //init formik
@@ -55,6 +55,7 @@ function ReceiveBillForm(props) {
       values.branchId = localStorage.getItem('userID');
       values.isCheckDelete = true;
       values.saleCatalogId = selectVal;
+      values.formOfReceipt = paymentsSelected;
 
       console.log('selectValselectVal', selectVal);
 
@@ -85,6 +86,29 @@ function ReceiveBillForm(props) {
     },
   ]);
 
+  //init values (status or form payments)
+
+  const [formOfReceipt, setFormOfReceipt] = useState([
+    {
+      id: 0,
+      name: 'home',
+      text: 'Tại nhà',
+      isChecked: true,
+    },
+    {
+      id: 1,
+      name: 'office',
+      text: 'Văn phòng',
+      isChecked: false,
+    },
+    {
+      id: 2,
+      name: 'banking',
+      text: 'Chuyển khoản',
+      isChecked: false,
+    },
+  ]);
+
   //handle Selected Item (status or formPayments)
 
   const handleSelectedItem = (index = 0, nameGroup) => {
@@ -97,6 +121,16 @@ function ReceiveBillForm(props) {
         }))
       );
       setStatusSelected(index);
+    }
+    if (nameGroup === 'formPayments') {
+      const newFormOfReceipt = [...formOfReceipt];
+      setFormOfReceipt(
+        newFormOfReceipt.map((item = 0, indexItem) => ({
+          ...item,
+          isChecked: index === indexItem ? true : false,
+        }))
+      );
+      setPaymentsSelected(index);
     }
   };
 
@@ -117,6 +151,7 @@ function ReceiveBillForm(props) {
       handleAdd();
     }
   };
+
   //handleEdit
 
   const handleEdit = async (id, checked) => {
@@ -164,6 +199,7 @@ function ReceiveBillForm(props) {
         ];
         setSelectVal(fillVal.saleCatalogId);
         handleSelectedItem(fillVal.status, 'status');
+        handleSelectedItem(fillVal.formOfReceipt, 'formPayments');
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
@@ -176,7 +212,6 @@ function ReceiveBillForm(props) {
   };
 
   //scroll top
-
   useEffect(() => {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
@@ -212,18 +247,6 @@ function ReceiveBillForm(props) {
   const handleChangeSelect = (value) => {
     setSelectVal(value);
   };
-  //call api catalog products
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const respone = await saleCatalogApi.getAll();
-        setSaleCatalogs(respone);
-      } catch (error) {
-        console.log('Failed to fetch Api', error);
-      }
-    })();
-  }, []);
 
   return (
     <>
@@ -330,13 +353,14 @@ function ReceiveBillForm(props) {
         </Row>
         <Row>
           <Col md={6}>
-            <h4 className="main-col__title">Trạng thái xử lý</h4>
-            <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
+            <h4 className="main-col__title">Hình thức nhận tiền</h4>
+            <RadioGroup nameGroup="formPayments" handleChange={handleSelectedItem} value={formOfReceipt} />
           </Col>
           <Col md={6}>
-            <h4 className="main-col__title">Tác Vụ</h4>
+            <h4 className="main-col__title">Trạng thái xử lý</h4>
             <div className="d-flex">
-              <Button type="submit" variant="md" className="btn-reset bg-yellow color-blue">
+              <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
+              <Button type="submit" variant="md" className="ms-5 btn-reset bg-yellow color-blue">
                 <i className="fa fa-print"></i> {isUpdate ? 'Cập nhật' : 'Lưu'}
               </Button>
             </div>
