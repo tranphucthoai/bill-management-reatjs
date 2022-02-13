@@ -22,18 +22,6 @@ function CollectionBillForm(props) {
   const [collectionCatalogs, setCollectionCatalogs] = useState([]);
   const [selectVal, setSelectVal] = useState('');
 
-  //call api load data table
-
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const respone = await collectionReceiptsApi.get('');
-  //     } catch (error) {
-  //       console.log('Failed to fetch Api', error);
-  //     }
-  //   })();
-  // }, []);
-
   //init formik
 
   const initValForm = {
@@ -57,8 +45,6 @@ function CollectionBillForm(props) {
       serviceNumber: Yup.string().min(4, 'Vui lòng nhập hơn 4 kí tự').required('Vui lòng nhập số hợp đồng'),
       paymentAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
       timeForPayment: Yup.date().min(1, 'Vui lòng nhập thời gian'),
-      // timeForPayment: Yup.date().min(currentDate, 'Nhập thời hạn thanh toán'),
-      // timeForPayment: Yup.date().max(new Date().toISOString().slice(0, 10), '???'),
       paymentAmountText: Yup.string(),
     }),
     onSubmit: async (values) => {

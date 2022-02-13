@@ -11,6 +11,7 @@ import TextField from '../../../../components/formControls/TextField/index';
 import { create, edit } from '../../receiveBillSlice';
 import saleCatalogApi from '../../../../api/saleCatalogApi';
 import ReceiveBillTable from './../ReceiveBillTable/index';
+import banksApi from './../../../../api/banksApi';
 
 ReceiveBillForm.propTypes = {};
 
@@ -21,16 +22,24 @@ function ReceiveBillForm(props) {
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.receiveBill);
   const [selectVal, setSelectVal] = useState('');
+  const [banks, setbank] = useState([]);
 
   //init formik
 
   const initValForm = {
-    phone: '',
-    name: '',
-    address: '',
-    productNumber: '',
-    quantity: '',
-    price: '',
+    senderPhone: '',
+    senderName: '',
+    senderCardId: '',
+    senderAddress: '',
+    receiverPhone: '',
+    receiverName: '',
+    receiverCardId: '',
+    receiverAddress: '',
+    transferAmount: 0,
+    transferFee: 0,
+    secretNumber: 0,
+    paymentAmount: 0,
+    paymentAmountText: '',
   };
 
   const formik = useFormik({
@@ -48,16 +57,27 @@ function ReceiveBillForm(props) {
         .min(13, 'Số CMND / Hộ chiếu ít nhất 13 chữ số')
         .required('Vui lòng nhập số CMND / Hộ chiếu'),
       receiverAddress: Yup.string().required('Vui lòng nhập địa chỉ'),
+
+      transferAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
+      transferFee: Yup.number().required('Vui lòng nhập lệ phí'),
+      secretNumber: Yup.number().required('Vui lòng nhập mã số bí mật'),
     }),
     onSubmit: async (values) => {
-      values.paymentAmount = values.quantity * values.price;
       values.status = statusSelected;
       values.branchId = localStorage.getItem('userID');
       values.isCheckDelete = true;
-      values.saleCatalogId = selectVal;
+      values.bankId = selectVal;
       values.formOfReceipt = paymentsSelected;
 
-      console.log('selectValselectVal', selectVal);
+      values.paymentAmount = values.transferAmount - values.transferFee;
+      values.isCheckDelete = true;
+      values.createdBy = '';
+      values.senderCardIdDateOfIssue = 0;
+      values.senderCardIdPlaceOfIssue = values.senderAddress;
+      values.receiverCardIdDateOfIssue = 0;
+      values.receiverCardIdPlaceOfIssue = values.receiverAddress;
+
+      values.banks = selectVal;
 
       if (isUpdate) {
         const respone = await receiveReceiptsApi.update(idItem, values);
@@ -66,7 +86,7 @@ function ReceiveBillForm(props) {
       }
       setReload((prev) => !prev);
       dispatch(create());
-      formik.resetForm();
+      resetForm();
     },
   });
 
@@ -138,7 +158,7 @@ function ReceiveBillForm(props) {
 
   const handleAdd = () => {
     dispatch(create());
-    formik.resetForm();
+    resetForm();
   };
 
   //handleDelete
@@ -170,16 +190,21 @@ function ReceiveBillForm(props) {
 
         formik.setValues(
           {
-            phone: fillVal.phone,
-            name: fillVal.name,
-            address: fillVal.address,
-
-            productNumber: fillVal.productNumber,
-            quantity: fillVal.quantity,
-            price: fillVal.price,
-
+            senderPhone: fillVal.senderPhone,
+            senderName: fillVal.senderName,
+            senderCardId: fillVal.senderCardId,
+            senderAddress: fillVal.senderAddress,
+            receiverPhone: fillVal.receiverPhone,
+            receiverName: fillVal.receiverName,
+            receiverCardId: fillVal.receiverCardId,
+            receiverAddress: fillVal.receiverAddress,
+            bankPlusPhone: fillVal.bankPlusPhone,
+            transferAmount: fillVal.transferAmount,
+            transferFee: fillVal.transferFee,
+            accountNumber: fillVal.accountNumber,
             paymentAmount: fillVal.paymentAmount,
-            paymentAmountText: VNnum2words(fillVal.paymentAmount),
+            secretNumber: fillVal.secretNumber,
+            paymentAmountText: VNnum2words(fillVal.paymentAmount).trim() + ' đồng',
           },
           true
         );
@@ -197,7 +222,7 @@ function ReceiveBillForm(props) {
             isChecked: !fillVal.status,
           },
         ];
-        setSelectVal(fillVal.saleCatalogId);
+        setSelectVal(fillVal.bankId);
         handleSelectedItem(fillVal.status, 'status');
         handleSelectedItem(fillVal.formOfReceipt, 'formPayments');
       } catch (error) {
@@ -209,6 +234,13 @@ function ReceiveBillForm(props) {
   const handleView = (id) => {
     dispatch(edit(''));
     dispatch(edit(id));
+  };
+
+  //reset form
+  const resetForm = () => {
+    formik.resetForm();
+    setSelectVal(banks[0]);
+    handleSelectedItem(0, 'status');
   };
 
   //scroll top
@@ -247,6 +279,19 @@ function ReceiveBillForm(props) {
   const handleChangeSelect = (value) => {
     setSelectVal(value);
   };
+
+  //call banks
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const respone = await banksApi.getAll();
+        setbank(respone);
+      } catch (error) {
+        console.log('Failed to fetch Api', error);
+      }
+    })();
+  }, []);
 
   return (
     <>
@@ -310,20 +355,39 @@ function ReceiveBillForm(props) {
               <Col md={6}>
                 <Row>
                   <Col md={6}>
-                    <TextField form={formik} name="receiverCardId" icon={'fa fa-home'} placeholder={'Ngân hàng'} />
+                    <SelectField
+                      form={formik}
+                      handleChange={handleChangeSelect}
+                      name="banks"
+                      icon="fa-folder-open"
+                      data={banks}
+                      selectVal={selectVal}
+                    />
                   </Col>
                   <Col md={6}>
-                    <TextField form={formik} name="receiverCardId" icon={'fa fa-key'} placeholder={'Mã số bí mật'} />
+                    <TextField form={formik} name="secretNumber" icon={'fa fa-key'} placeholder={'Mã số bí mật'} />
                   </Col>
                 </Row>
               </Col>
               <Col md={6}>
                 <Row>
                   <Col md={6}>
-                    <TextField form={formik} name="receiverCardId" icon={'fa fa-usd'} placeholder={'Số tiền nhận'} />
+                    <TextField
+                      type="number"
+                      form={formik}
+                      name="transferAmount"
+                      icon={'fa fa-usd'}
+                      placeholder={'Số tiền nhận'}
+                    />
                   </Col>
                   <Col md={6}>
-                    <TextField form={formik} name="receiverCardId" icon={'fa fa-plus'} placeholder={'Lệ phí'} />
+                    <TextField
+                      type="number"
+                      form={formik}
+                      name="transferFee"
+                      icon={'fa fa-plus'}
+                      placeholder={'Lệ phí'}
+                    />
                   </Col>
                 </Row>
               </Col>

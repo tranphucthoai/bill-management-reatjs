@@ -22,18 +22,6 @@ function SaleBillForm(props) {
   const [saleCatalogs, setSaleCatalogs] = useState([]);
   const [selectVal, setSelectVal] = useState('CardViettle');
 
-  //call api load data table
-
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const respone = await saleReceiptsApi.get('ok');
-  //     } catch (error) {
-  //       console.log('Failed to fetch Api', error);
-  //     }
-  //   })();
-  // }, []);
-
   //init formik
 
   const initValForm = {
@@ -64,8 +52,6 @@ function SaleBillForm(props) {
       values.branchId = localStorage.getItem('userID');
       values.isCheckDelete = true;
       values.saleCatalogId = selectVal;
-
-      console.log('selectValselectVal', selectVal);
 
       if (isUpdate) {
         const respone = await saleReceiptsApi.update(idItem, values);

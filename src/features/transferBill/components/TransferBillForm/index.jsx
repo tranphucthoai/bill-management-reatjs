@@ -16,6 +16,7 @@ function TransferBillForm() {
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.transferBill);
+
   //init formik
 
   const initValForm = {
