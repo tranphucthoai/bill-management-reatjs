@@ -35,11 +35,10 @@ function ReceiveBillForm(props) {
     receiverName: '',
     receiverCardId: '',
     receiverAddress: '',
-    transferAmount: 0,
-    transferFee: 0,
-    secretNumber: 0,
-    paymentAmount: 0,
-    paymentAmountText: '',
+    transferAmount: '',
+    transferFee: '',
+    secretNumber: '',
+    paymentAmount: '',
   };
 
   const formik = useFormik({
@@ -90,7 +89,7 @@ function ReceiveBillForm(props) {
     },
   });
 
-  //init values (status or form payments)
+  //init values status
   const [status, setStatus] = useState([
     {
       id: 0,
@@ -106,7 +105,7 @@ function ReceiveBillForm(props) {
     },
   ]);
 
-  //init values (status or form payments)
+  //init values form payments
 
   const [formOfReceipt, setFormOfReceipt] = useState([
     {
@@ -241,6 +240,7 @@ function ReceiveBillForm(props) {
     formik.resetForm();
     setSelectVal(banks[0]);
     handleSelectedItem(0, 'status');
+    handleSelectedItem(0, 'formPayments');
   };
 
   //scroll top
@@ -248,30 +248,6 @@ function ReceiveBillForm(props) {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
 
-  // const handleInputTransferAmount = (e, valueTransferAmount, valueTransferFee) => {
-  //   if (valueTransferFee) {
-  //     const newValue = Number.parseInt(e.target.value) - valueTransferFee;
-  //     formik.setValues(
-  //       {
-  //         paymentAmountText: VNnum2words(newValue),
-  //         paymentAmount: newValue,
-  //       },
-  //       false
-  //     );
-  //   }
-  // };
-  const handleInputTransferFee = (e, valueTransferAmount, valueTransferFee) => {
-    if (valueTransferAmount) {
-      const newValue = valueTransferAmount - Number.parseInt(e.target.value);
-      formik.setValues(
-        {
-          paymentAmountText: VNnum2words(newValue),
-          paymentAmount: newValue,
-        },
-        false
-      );
-    }
-  };
   const handleInputPaymentAmount = (e) => {
     // console.log('e.target.value', e.target.value);
   };
