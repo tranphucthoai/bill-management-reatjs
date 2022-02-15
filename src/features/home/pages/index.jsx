@@ -41,8 +41,8 @@ function Home(props) {
     <section className="main-col">
       <Row className="flex-space-20 align-items-center">
         {data.map((item) => (
-          <Col sm={6}>
-            <HomeCard key={item.id} data={item} />
+          <Col key={item.id} sm={6}>
+            <HomeCard data={item} />
           </Col>
         ))}
       </Row>

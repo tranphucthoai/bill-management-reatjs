@@ -64,7 +64,8 @@ function SaleBillForm(props) {
     },
   });
 
-  //init values (status or form payments)
+  //init value
+
   const [status, setStatus] = useState([
     {
       id: 0,
@@ -74,13 +75,13 @@ function SaleBillForm(props) {
     },
     {
       id: 1,
-      name: 'peding',
+      name: 'pending',
       text: 'Chưa xử lý',
       isChecked: false,
     },
   ]);
 
-  //handle Selected Item (status or formPayments)
+  //handle Selected Item
 
   const handleSelectedItem = (index = 0, nameGroup) => {
     if (nameGroup === 'status') {
@@ -126,8 +127,6 @@ function SaleBillForm(props) {
     (async () => {
       try {
         const fillVal = await saleReceiptsApi.get(idItem);
-        console.log('fillVal', fillVal);
-
         formik.setValues(
           {
             phone: fillVal.phone,

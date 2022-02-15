@@ -36,7 +36,6 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
     (async () => {
       try {
         const respone = await saleReceiptsApi.getAll(queryParams);
-        console.log('respone ok', respone);
         setData(respone);
       } catch (error) {
         console.log('Failed to fetch api', error);
