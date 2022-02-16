@@ -31,6 +31,8 @@ function SaleBillForm(props) {
     productNumber: '',
     quantity: '',
     price: '',
+    paymentAmountText: '',
+    paymentAmount: '',
   };
 
   const formik = useFormik({
@@ -60,7 +62,8 @@ function SaleBillForm(props) {
       }
       setReload((prev) => !prev);
       dispatch(create());
-      formik.resetForm();
+      // formik.resetForm();
+      resetForm();
     },
   });
 
@@ -100,7 +103,8 @@ function SaleBillForm(props) {
 
   const handleAdd = () => {
     dispatch(create());
-    formik.resetForm();
+    // formik.resetForm();
+    resetForm();
   };
 
   //handleDelete
@@ -167,6 +171,13 @@ function SaleBillForm(props) {
   const handleView = (id) => {
     dispatch(edit(''));
     dispatch(edit(id));
+  };
+
+  //reset form
+  const resetForm = () => {
+    formik.resetForm();
+    setSelectVal(saleCatalogs[0]);
+    handleSelectedItem(0, 'status');
   };
 
   //scroll top

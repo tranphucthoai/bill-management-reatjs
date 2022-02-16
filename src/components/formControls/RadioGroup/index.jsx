@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import './style.scss';
 
 RadioGroup.propTypes = {
-  selectedItem: PropTypes.number,
   value: PropTypes.array,
   nameGroup: PropTypes.string,
   handleChange: PropTypes.func,
