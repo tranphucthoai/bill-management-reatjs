@@ -131,7 +131,7 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
                     <td>
                       <div className="box-status">
                         <input
-                          onClick={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
+                          onChange={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
                           className="box-status__input"
                           id={`statusTable${item.id}`}
                           type="checkbox"

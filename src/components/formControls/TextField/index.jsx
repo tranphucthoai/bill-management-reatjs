@@ -10,7 +10,8 @@ TextField.propTypes = {
   placeholder: PropTypes.string,
   name: PropTypes.string,
   type: PropTypes.string,
-  customInput: PropTypes.func,
+  customOnChange: PropTypes.func,
+  customOnBlur: PropTypes.func,
   readOnly: PropTypes.bool,
 };
 
@@ -20,7 +21,8 @@ function TextField({
   form = {},
   name = '',
   type = 'text',
-  customInput = null,
+  customOnBlur = null,
+  customOnChange = null,
   readOnly = false,
 }) {
   return (
@@ -33,8 +35,18 @@ function TextField({
         type={type}
         name={name}
         placeholder={placeholder}
-        onChange={form.handleChange}
-        onBlur={form.handleBlur}
+        onChange={(e) => {
+          form.handleChange(e);
+          customOnChange(e.target.value, name);
+        }}
+        onBlur={(e) => {
+          form.handleBlur(e);
+          if (!customOnBlur) return;
+          customOnBlur(e.target.value, name);
+        }}
+        onKeyUp={(e) => {
+          customOnChange(e.target.value, name);
+        }}
         value={form.values[name]}
         isInvalid={!!form.errors[name]}
         feedback={form.errors[name]}

@@ -21,6 +21,8 @@ function SaleBillForm(props) {
   const { isUpdate, idItem } = useSelector((state) => state.saleBill);
   const [saleCatalogs, setSaleCatalogs] = useState([]);
   const [selectVal, setSelectVal] = useState('CardViettle');
+  const [price, setPrice] = useState(0);
+  const [quantity, setQuantity] = useState(0);
 
   //init formik
 
@@ -46,7 +48,7 @@ function SaleBillForm(props) {
         .required('Vui lòng nhập số lượng')
         .moreThan(0, 'Số lượng lớn hơn không')
         .integer('Số lượng là số nguyên'),
-      price: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
+      price: Yup.number().required('Vui lòng nhập số tiền'),
     }),
     onSubmit: async (values) => {
       values.paymentAmount = values.quantity * values.price;
@@ -142,7 +144,7 @@ function SaleBillForm(props) {
             price: fillVal.price,
 
             paymentAmount: fillVal.paymentAmount,
-            paymentAmountText: VNnum2words(fillVal.paymentAmount),
+            paymentAmountText: VNnum2words(fillVal.paymentAmount).trim() + ' đồng',
           },
           true
         );
@@ -176,7 +178,8 @@ function SaleBillForm(props) {
   //reset form
   const resetForm = () => {
     formik.resetForm();
-    setSelectVal(saleCatalogs[0]);
+    setSelectVal(saleCatalogs[0].id);
+
     handleSelectedItem(0, 'status');
   };
 
@@ -186,32 +189,24 @@ function SaleBillForm(props) {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
 
-  // const handleInputTransferAmount = (e, valueTransferAmount, valueTransferFee) => {
-  //   if (valueTransferFee) {
-  //     const newValue = Number.parseInt(e.target.value) - valueTransferFee;
-  //     formik.setValues(
-  //       {
-  //         paymentAmountText: VNnum2words(newValue),
-  //         paymentAmount: newValue,
-  //       },
-  //       false
-  //     );
-  //   }
-  // };
-  const handleInputTransferFee = (e, valueTransferAmount, valueTransferFee) => {
-    if (valueTransferAmount) {
-      const newValue = valueTransferAmount - Number.parseInt(e.target.value);
+  const handleInputPaymentAmount = (value, name) => {
+    if (Number.parseFloat(value) > 0) {
+      if (name === 'price') {
+        setPrice(Number.parseFloat(value));
+      }
+      if (name === 'quantity') {
+        setQuantity(Number.parseFloat(value));
+      }
+    }
+    if (price > 0 && quantity > 0) {
       formik.setValues(
         {
-          paymentAmountText: VNnum2words(newValue),
-          paymentAmount: newValue,
+          paymentAmount: price * quantity,
+          paymentAmountText: VNnum2words(price * quantity).trim() + ' đồng',
         },
-        false
+        true
       );
     }
-  };
-  const handleInputPaymentAmount = (e) => {
-    // console.log('e.target.value', e.target.value);
   };
 
   const handleChangeSelect = (value) => {
@@ -265,10 +260,26 @@ function SaleBillForm(props) {
             <TextField form={formik} name="productNumber" icon={'fa-barcode'} placeholder={'Mã số sản phẩm (nếu có)'} />
             <Row>
               <Col md={6}>
-                <TextField form={formik} name="quantity" icon={'fa-calculator'} placeholder={'Số lượng'} />
+                <TextField
+                  form={formik}
+                  name="quantity"
+                  icon={'fa-calculator'}
+                  placeholder={'Số lượng'}
+                  type="number"
+                  customOnChange={handleInputPaymentAmount}
+                  customOnBlur={handleInputPaymentAmount}
+                />
               </Col>
               <Col md={6}>
-                <TextField form={formik} name="price" icon={'fa-money'} placeholder={'Đơn giá'} />
+                <TextField
+                  form={formik}
+                  name="price"
+                  type="number"
+                  icon={'fa-money'}
+                  placeholder={'Đơn giá'}
+                  customOnChange={handleInputPaymentAmount}
+                  customOnBlur={handleInputPaymentAmount}
+                />
               </Col>
             </Row>
           </Col>
@@ -283,7 +294,8 @@ function SaleBillForm(props) {
               name="paymentAmount"
               icon={'fa-pause'}
               placeholder={'Số tiền thanh toán'}
-              customInput={handleInputPaymentAmount}
+              // customOnchang={handleInputPaymentAmount}
+              // customOnBlur={handleInputPaymentAmount}
             />
           </Col>
         </Row>
@@ -295,7 +307,6 @@ function SaleBillForm(props) {
               name="paymentAmountText"
               icon={'fa-text-width'}
               placeholder={'Số tiền thanh toán bằng chữ'}
-              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
