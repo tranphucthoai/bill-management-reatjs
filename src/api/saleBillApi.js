@@ -1,26 +1,26 @@
 import axiosClient from './axiosClient';
 
-const saleReceiptsApi = {
+const saleBillApi = {
   getAll(params) {
-    const url = '/saleReceipts';
+    const url = '/saleBill';
     return axiosClient.get(url, { params });
   },
   get(id) {
-    const url = `/saleReceipts/${id}`;
+    const url = `/saleBill/${id}`;
     return axiosClient.get(url);
   },
   add(data) {
-    const url = '/saleReceipts';
+    const url = '/saleBill';
     return axiosClient.post(url, data);
   },
   update(id, data) {
-    const url = `/saleReceipts/${id}`;
+    const url = `/saleBill/${id}`;
     return axiosClient.patch(url, data);
   },
   remove(id) {
-    const url = `/saleReceipts/${id}`;
+    const url = `/saleBill/${id}`;
     return axiosClient.delete(url);
   },
 };
 
-export default saleReceiptsApi;
+export default saleBillApi;

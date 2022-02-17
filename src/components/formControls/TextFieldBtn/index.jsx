@@ -9,13 +9,13 @@ TextFieldBtn.propTypes = {
   handleChange: PropTypes.func,
   handleReset: PropTypes.func,
   placeholder: PropTypes.string,
+  fieldFilter: PropTypes.string,
 };
 
-function TextFieldBtn({ placeholder = '', handleReset = null, handleChange = null }) {
+function TextFieldBtn({ placeholder = '', handleReset = null, handleChange = null, fieldFilter = '' }) {
   const location = useLocation();
   const params = queryString.parse(location.search);
-  const keyList = Object.keys(params);
-  const [search, setSearch] = useState(params[keyList[0]] || '');
+  const [search, setSearch] = useState(params[fieldFilter] || '');
 
   const onChange = (value) => {
     setSearch(value);

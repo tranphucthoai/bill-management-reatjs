@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import saleReceiptsApi from '../../../../api/saleReceiptsApi';
+import saleReceiptsApi from '../../../../api/saleBillApi';
 import TextFieldBtn from '../../../../components/formControls/TextFieldBtn/index';
 import { formatPrice } from './../../../../constans/common';
 import propTypes from 'prop-types';
 import queryString from 'query-string';
 import moment from 'moment';
+import PaginationNormal from './../../../../components/formControls/PaginationNormal/index';
 
 SaleBillTable.propTypes = {
   reLoad: propTypes.bool,
@@ -17,6 +18,7 @@ SaleBillTable.propTypes = {
 
 function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
   const [data, setData] = useState([]);
+  const [pagination, setPagination] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
   const params = queryString.parse(location.search);
@@ -24,19 +26,23 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
   const queryParams = useMemo(() => {
     return {
       phone_like: params.phone_like || '',
+      _page: params._page || 1,
+      _limit: params._limit || 5,
     };
   }, [location.search]);
 
   useEffect(() => {
     (async () => {
       try {
-        const respone = await saleReceiptsApi.getAll(queryParams);
-        setData(respone);
+        const { data, pagination } = await saleReceiptsApi.getAll(queryParams);
+        setData(data);
+        setPagination(pagination);
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
     })();
   }, [reLoad, queryParams]);
+
   const onView = (id) => {
     if (!handleView) return;
     handleView(id);
@@ -62,7 +68,22 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
     });
   };
   const handleReset = () => {
-    const filters = {};
+    const filters = {
+      ...queryParams,
+      phone_like: '',
+    };
+    navigate({
+      pathname: location.pathname,
+      search: queryString.stringify(filters),
+    });
+  };
+
+  const handlePaginChange = (page) => {
+    const filters = {
+      ...queryParams,
+      _page: page,
+    };
+
     navigate({
       pathname: location.pathname,
       search: queryString.stringify(filters),
@@ -77,6 +98,7 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
               handleChange={handleChange}
               handleReset={handleReset}
               placeholder={'Nhập số điện thoại để tìm kiếm ...'}
+              fieldFilter={'phone_like'}
             />
             <Table responsive striped bordered hover className="table-normal">
               <thead>
@@ -116,7 +138,7 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
                     <td>
                       {item.quantity} x {formatPrice(item.price)}
                     </td>
-                    <td>{formatPrice(Number.parseInt(item.price) * Number.parseInt(item.quantity))}</td>
+                    <td>{formatPrice(item.totalMoney)}</td>
                     <td>
                       <div className="box-status">
                         <input
@@ -150,6 +172,8 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
                 ))}
               </tbody>
             </Table>
+
+            <PaginationNormal onChange={handlePaginChange} pagination={pagination} />
           </div>
         </Col>
       </Row>

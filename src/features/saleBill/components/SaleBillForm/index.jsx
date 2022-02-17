@@ -4,7 +4,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import saleReceiptsApi from '../../../../api/saleReceiptsApi';
+import saleReceiptsApi from '../../../../api/saleBillApi';
 import RadioGroup from '../../../../components/formControls/RadioGroup/index';
 import SelectField from '../../../../components/formControls/SelectField';
 import TextField from '../../../../components/formControls/TextField/index';
@@ -33,8 +33,8 @@ function SaleBillForm(props) {
     productNumber: '',
     quantity: '',
     price: '',
-    paymentAmountText: '',
-    paymentAmount: '',
+    totalMoneyText: '',
+    totalMoney: '',
   };
 
   const formik = useFormik({
@@ -51,7 +51,7 @@ function SaleBillForm(props) {
       price: Yup.number().required('Vui lòng nhập số tiền'),
     }),
     onSubmit: async (values) => {
-      values.paymentAmount = values.quantity * values.price;
+      values.totalMoney = values.quantity * values.price;
       values.status = statusSelected;
       values.branchId = localStorage.getItem('userID');
       values.isCheckDelete = true;
@@ -159,8 +159,8 @@ function SaleBillForm(props) {
             quantity: fillVal.quantity,
             price: fillVal.price,
 
-            paymentAmount: fillVal.paymentAmount,
-            paymentAmountText: VNnum2words(fillVal.paymentAmount).trim() + ' đồng',
+            totalMoney: fillVal.totalMoney,
+            totalMoneyText: VNnum2words(fillVal.totalMoney).trim() + ' đồng',
           },
           true
         );
@@ -198,8 +198,8 @@ function SaleBillForm(props) {
       formik.setValues(
         (prev) => ({
           ...prev,
-          paymentAmount: totalMoney >= 0 ? totalMoney : '',
-          paymentAmountText: totalMoney >= 0 ? VNnum2words(totalMoney).trim() + ' đồng' : '',
+          totalMoney: totalMoney >= 0 ? totalMoney : '',
+          totalMoneyText: totalMoney >= 0 ? VNnum2words(totalMoney).trim() + ' đồng' : '',
         }),
         false
       );
@@ -299,11 +299,9 @@ function SaleBillForm(props) {
               readOnly={true}
               type="number"
               form={formik}
-              name="paymentAmount"
+              name="totalMoney"
               icon={'fa-pause'}
               placeholder={'Số tiền thanh toán'}
-              // customOnchang={handleInputPaymentAmount}
-              // customOnBlur={handleInputPaymentAmount}
             />
           </Col>
         </Row>
@@ -312,7 +310,7 @@ function SaleBillForm(props) {
             <TextField
               readOnly={true}
               form={formik}
-              name="paymentAmountText"
+              name="totalMoneyText"
               icon={'fa-text-width'}
               placeholder={'Số tiền thanh toán bằng chữ'}
             />
