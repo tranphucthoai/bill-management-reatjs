@@ -11,6 +11,7 @@ import TextField from '../../../../components/formControls/TextField/index';
 import { create, edit } from '../../salesBillSlice';
 import SaleBillTable from '../SaleBillTable/index';
 import saleCatalogApi from './../../../../api/saleCatalogApi';
+import ToastNormal from './../../../../components/ToastNormal/index';
 
 SaleBillForm.propTypes = {};
 
@@ -21,11 +22,10 @@ function SaleBillForm(props) {
   const { isUpdate, idItem } = useSelector((state) => state.saleBill);
   const [saleCatalogs, setSaleCatalogs] = useState([]);
   const [selectVal, setSelectVal] = useState('CardViettle');
-  const [price, setPrice] = useState(0);
-  const [quantity, setQuantity] = useState(0);
+  const [showToast, setShowToast] = useState(false);
+  const [fieldToast, setFieldToast] = useState({});
 
   //init formik
-
   const initValForm = {
     phone: '',
     name: '',
@@ -58,19 +58,27 @@ function SaleBillForm(props) {
       values.saleCatalogId = selectVal;
 
       if (isUpdate) {
-        const respone = await saleReceiptsApi.update(idItem, values);
+        try {
+          await saleReceiptsApi.update(idItem, values);
+        } catch (error) {
+          showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
+        }
+        showToastItem('success', 'Thêm Thành Công', 'Đã cập nhật thành công một trường');
       } else {
-        const respone = await saleReceiptsApi.add(values);
+        try {
+          await saleReceiptsApi.add(values);
+        } catch (error) {
+          showToastItem('danger', 'Lỗi Quá Trình Thêm Mới !!!', error);
+        }
+        showToastItem('success', 'Thêm Thành Công', 'Đã thêm mới thành công một trường');
       }
       setReload((prev) => !prev);
       dispatch(create());
-      // formik.resetForm();
       resetForm();
     },
   });
 
   //init value
-
   const [status, setStatus] = useState([
     {
       id: 0,
@@ -87,7 +95,6 @@ function SaleBillForm(props) {
   ]);
 
   //handle Selected Item
-
   const handleSelectedItem = (index = 0, nameGroup) => {
     if (nameGroup === 'status') {
       const newStatus = [...status];
@@ -102,7 +109,6 @@ function SaleBillForm(props) {
   };
 
   //handleAdd
-
   const handleAdd = () => {
     dispatch(create());
     // formik.resetForm();
@@ -110,25 +116,35 @@ function SaleBillForm(props) {
   };
 
   //handleDelete
-
   const handleDelete = async (id) => {
-    const respone = await saleReceiptsApi.remove(id);
+    try {
+      await saleReceiptsApi.remove(id);
+    } catch (error) {
+      showToastItem('danger', 'Lỗi Quá Trình Xoá !!!', error);
+    }
+    showToastItem('success', 'Xoá Thành Công', 'Đã xoá thành công một trường');
+
     setReload((prev) => !prev);
 
     if (id === idItem) {
       handleAdd();
     }
   };
-  //handleEdit
 
+  //handleEdit
   const handleEdit = async (id, checked) => {
-    const respone = await saleReceiptsApi.update(id, {
-      status: checked,
-    });
+    try {
+      await saleReceiptsApi.update(id, {
+        status: checked,
+      });
+    } catch (error) {
+      showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
+    }
+    showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công trạng thái một trường');
     setReload((prev) => !prev);
   };
-  //handleView
 
+  //handleView
   useEffect(() => {
     (async () => {
       try {
@@ -148,20 +164,6 @@ function SaleBillForm(props) {
           },
           true
         );
-        const newStatus = [
-          {
-            id: 0,
-            name: 'processed',
-            text: 'Đã xử lí',
-            isChecked: fillVal.status,
-          },
-          {
-            id: 1,
-            name: 'peding',
-            text: 'Chưa xử lý',
-            isChecked: !fillVal.status,
-          },
-        ];
         setSelectVal(fillVal.saleCatalogId);
         handleSelectedItem(fillVal.status, 'status');
       } catch (error) {
@@ -184,27 +186,22 @@ function SaleBillForm(props) {
   };
 
   //scroll top
-
   useEffect(() => {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
 
-  const handleInputPaymentAmount = (value, name) => {
-    if (Number.parseFloat(value) > 0) {
-      if (name === 'price') {
-        setPrice(Number.parseFloat(value));
-      }
-      if (name === 'quantity') {
-        setQuantity(Number.parseFloat(value));
-      }
-    }
-    if (price > 0 && quantity > 0) {
+  const calcTotalMoney = () => {
+    const totalMoney = formik.values['price'] * formik.values['quantity'];
+    const price = formik.values['price'];
+    const quantity = formik.values['quantity'];
+    if (price >= 0 && quantity >= 0) {
       formik.setValues(
-        {
-          paymentAmount: price * quantity,
-          paymentAmountText: VNnum2words(price * quantity).trim() + ' đồng',
-        },
-        true
+        (prev) => ({
+          ...prev,
+          paymentAmount: totalMoney >= 0 ? totalMoney : '',
+          paymentAmountText: totalMoney >= 0 ? VNnum2words(totalMoney).trim() + ' đồng' : '',
+        }),
+        false
       );
     }
   };
@@ -224,6 +221,19 @@ function SaleBillForm(props) {
       }
     })();
   }, []);
+
+  //show toast
+  const showToastItem = (type, title, massage) => {
+    setShowToast(true);
+    setFieldToast({
+      type,
+      title,
+      massage,
+    });
+  };
+  const handleHideToast = () => {
+    setShowToast(false);
+  };
 
   return (
     <>
@@ -266,8 +276,7 @@ function SaleBillForm(props) {
                   icon={'fa-calculator'}
                   placeholder={'Số lượng'}
                   type="number"
-                  customOnChange={handleInputPaymentAmount}
-                  customOnBlur={handleInputPaymentAmount}
+                  customInput={calcTotalMoney}
                 />
               </Col>
               <Col md={6}>
@@ -277,8 +286,7 @@ function SaleBillForm(props) {
                   type="number"
                   icon={'fa-money'}
                   placeholder={'Đơn giá'}
-                  customOnChange={handleInputPaymentAmount}
-                  customOnBlur={handleInputPaymentAmount}
+                  customInput={calcTotalMoney}
                 />
               </Col>
             </Row>
@@ -326,6 +334,7 @@ function SaleBillForm(props) {
         </Row>
       </form>
       <SaleBillTable handleEdit={handleEdit} handleDelete={handleDelete} handleView={handleView} reLoad={reLoad} />
+      <ToastNormal fieldToast={fieldToast} showToast={showToast} hideToast={handleHideToast} />
     </>
   );
 }

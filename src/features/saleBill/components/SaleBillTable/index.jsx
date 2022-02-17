@@ -27,11 +27,6 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
     };
   }, [location.search]);
 
-  const [filters, setFilters] = useState(() => ({
-    ...queryParams,
-    phone_like: '',
-  }));
-
   useEffect(() => {
     (async () => {
       try {
@@ -51,16 +46,11 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
 
     handleDelete(id);
   };
-
   const onEdit = (id, checked) => {
     if (!onEdit) return;
     handleEdit(id, checked);
   };
   const handleChange = (value) => {
-    setFilters((prev) => ({
-      ...prev,
-      phone_like: value,
-    }));
     const filters = {
       ...queryParams,
       phone_like: value,
@@ -72,7 +62,6 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
     });
   };
   const handleReset = () => {
-    setFilters({});
     const filters = {};
     navigate({
       pathname: location.pathname,

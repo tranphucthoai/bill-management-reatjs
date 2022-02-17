@@ -14,7 +14,9 @@ TextFieldBtn.propTypes = {
 function TextFieldBtn({ placeholder = '', handleReset = null, handleChange = null }) {
   const location = useLocation();
   const params = queryString.parse(location.search);
-  const [search, setSearch] = useState(params.senderPhone_like || '');
+  const keyList = Object.keys(params);
+  const [search, setSearch] = useState(params[keyList[0]] || '');
+
   const onChange = (value) => {
     setSearch(value);
     if (!handleChange) return;
@@ -33,6 +35,7 @@ function TextFieldBtn({ placeholder = '', handleReset = null, handleChange = nul
         className="search-normal__input"
         placeholder={placeholder}
         aria-label=""
+        value={search}
       />
       <Button onClick={onReset} variant="outline-secondary" className="btn-reset search-normal__delete">
         <i className="fa fa-times"></i>

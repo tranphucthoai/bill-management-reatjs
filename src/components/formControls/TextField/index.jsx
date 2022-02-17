@@ -10,8 +10,7 @@ TextField.propTypes = {
   placeholder: PropTypes.string,
   name: PropTypes.string,
   type: PropTypes.string,
-  customOnChange: PropTypes.func,
-  customOnBlur: PropTypes.func,
+  customInput: PropTypes.func,
   readOnly: PropTypes.bool,
 };
 
@@ -21,12 +20,14 @@ function TextField({
   form = {},
   name = '',
   type = 'text',
-  customOnBlur = null,
-  customOnChange = null,
+  customInput = null,
   readOnly = false,
 }) {
   return (
-    <InputGroup hasValidation className={clsx('input-normal', !!form.errors[name] ? 'mb-2' : 'mb-4')}>
+    <InputGroup
+      hasValidation
+      className={clsx('input-normal', !!form.errors[name] && form.touched[name] ? 'mb-2' : 'mb-4')}
+    >
       <InputGroup.Text className="input-group-text">
         <i className={clsx('fa', icon)}></i>
       </InputGroup.Text>
@@ -36,24 +37,23 @@ function TextField({
         name={name}
         placeholder={placeholder}
         onChange={(e) => {
+          if (customInput) customInput();
           form.handleChange(e);
-          customOnChange(e.target.value, name);
         }}
         onBlur={(e) => {
+          if (customInput) customInput();
           form.handleBlur(e);
-          if (!customOnBlur) return;
-          customOnBlur(e.target.value, name);
         }}
         onKeyUp={(e) => {
-          customOnChange(e.target.value, name);
+          if (customInput) customInput();
         }}
         value={form.values[name]}
-        isInvalid={!!form.errors[name]}
+        isInvalid={!!form.errors[name] && form.touched[name]}
         feedback={form.errors[name]}
         feedbacktype="invalid"
         id={name}
       />
-      {form.errors[name] ? (
+      {form.errors[name] && form.touched[name] ? (
         <Form.Control.Feedback type="invalid">{form.errors[name]}</Form.Control.Feedback>
       ) : (
         <Form.Control.Feedback type="valid">Looks good!</Form.Control.Feedback>
