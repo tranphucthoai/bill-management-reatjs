@@ -40,10 +40,18 @@ function SideBar() {
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            <Dropdown.Item href="saleBill">Hoá Đơn Bán Hàng</Dropdown.Item>
-            <Dropdown.Item href="transferBill">Hoá Đơn Chuyển Tiền</Dropdown.Item>
-            <Dropdown.Item href="#/action-3">Hoá Đơn Nhận Tiền</Dropdown.Item>
-            <Dropdown.Item href="#/action-3">Hoá Đơn Thu Hộ</Dropdown.Item>
+            <Link variant={Dropdown.Item} to="/saleBill">
+              Hoá Đơn Bán Hàng
+            </Link>
+            <Link variant={Dropdown.Item} to="/transferBill">
+              Hoá Đơn Chuyển Tiền
+            </Link>
+            <Link variant={Dropdown.Item} to="/collectionBill">
+              Hoá Đơn Nhận Tiền
+            </Link>
+            <Link variant={Dropdown.Item} to="/receiveBill">
+              Hoá Đơn Thu Hộ
+            </Link>
           </Dropdown.Menu>
         </Dropdown>
 

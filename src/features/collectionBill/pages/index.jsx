@@ -2,9 +2,7 @@ import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import CollectionBillForm from '../components/CollectionBillForm';
 
-CollectionBill.propTypes = {};
-
-function CollectionBill(props) {
+function CollectionBill() {
   return (
     <section className="main-col">
       <Row>
