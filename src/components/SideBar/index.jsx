@@ -89,11 +89,11 @@ function SideBar() {
           {userName.length > 0 && (
             <ul>
               <li>
-                <Link to={'/home'}>Về Trang Chủ</Link>
+                <Link to="/home">Về Trang Chủ</Link>
               </li>
               <li>|</li>
               <li>
-                <Link href="">Đổi Mật Khẩu</Link>
+                <Link to="/home">Đổi Mật Khẩu</Link>
               </li>
             </ul>
           )}
