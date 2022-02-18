@@ -4,8 +4,10 @@ import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import transferReceiptsApi from '../../../../api/transferReceiptsApi';
+import transferBillApi from '../../../../api/transferBillApi';
 import TextFieldBtn from './../../../../components/formControls/TextFieldBtn/index';
+import Loader from './../../../../components/Loader/index';
+import PaginationNormal from './../../../../components/PaginationNormal/index';
 import { formatPrice } from './../../../../constans/common';
 
 TransferBillTable.propTypes = {
@@ -17,6 +19,8 @@ TransferBillTable.propTypes = {
 
 function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
   const [data, setData] = useState([]);
+  const [pagination, setPagination] = useState({});
+  const [loader, setLoader] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const params = queryString.parse(location.search);
@@ -24,22 +28,21 @@ function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = n
   const queryParams = useMemo(() => {
     return {
       senderPhone_like: params.senderPhone_like || '',
+      _page: params._page || 1,
+      _limit: params._limit || 5,
     };
   }, [location.search]);
-
-  const [filters, setFilters] = useState(() => ({
-    ...queryParams,
-    senderPhone_like: '',
-  }));
 
   useEffect(() => {
     (async () => {
       try {
-        const respone = await transferReceiptsApi.getAll(queryParams);
-        setData(respone);
+        const { data, pagination } = await transferBillApi.getAll(queryParams);
+        setData(data);
+        setPagination(pagination);
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
+      setLoader(false);
     })();
   }, [reLoad, queryParams]);
   const onView = (id) => {
@@ -58,10 +61,6 @@ function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = n
   };
 
   const handleChange = (value) => {
-    setFilters((prev) => ({
-      ...prev,
-      senderPhone_like: value,
-    }));
     const filters = {
       ...queryParams,
       senderPhone_like: value,
@@ -73,13 +72,32 @@ function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = n
     });
   };
   const handleReset = () => {
-    setFilters({});
-    const filters = {};
+    const filters = {
+      ...queryParams,
+      senderPhone_like: '',
+    };
     navigate({
       pathname: location.pathname,
       search: queryString.stringify(filters),
     });
   };
+
+  const handlePaginChange = (page) => {
+    const filters = {
+      ...queryParams,
+      _page: page,
+    };
+
+    navigate({
+      pathname: location.pathname,
+      search: queryString.stringify(filters),
+    });
+  };
+
+  //loader
+  if (loader) {
+    return <Loader />;
+  }
   return (
     <>
       <Row>
@@ -89,6 +107,7 @@ function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = n
               handleChange={handleChange}
               handleReset={handleReset}
               placeholder={'Nhập số điện thoại để tìm kiếm ...'}
+              fieldFilter={'senderPhone_like'}
             />
             <Table responsive striped bordered hover className="table-normal">
               <thead>
@@ -128,13 +147,13 @@ function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = n
                       {item.receiverAddress}
                     </td>
                     <td>
-                      {formatPrice(item.transferAmount)}
+                      {formatPrice(item.subTotal)}
                       <br />
-                      {formatPrice(item.transferFee)}
+                      {formatPrice(item.fees)}
                       <br />
                     </td>
                     <td>
-                      {formatPrice(item.paymentAmount)}
+                      {formatPrice(item.grandTotal)}
                       <br />
                       {moment(item.createdAt).format('MM-DD-YYYY')}
                       <br />
@@ -142,12 +161,12 @@ function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = n
                     <td>
                       <div className="box-status">
                         <input
-                          onClick={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
+                          onChange={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
                           className="box-status__input"
                           id={`statusTable${item.id}`}
                           type="checkbox"
                           hidden
-                          checked={item.status == 0 ? true : false}
+                          checked={item.status === 0 ? true : false}
                         />
                         <label className="box-status__label" htmlFor={`statusTable${item.id}`}>
                           <i className="fa"></i>
@@ -172,6 +191,8 @@ function TransferBillTable({ reLoad = false, handleDelete = null, handleEdit = n
                 ))}
               </tbody>
             </Table>
+
+            <PaginationNormal onChange={handlePaginChange} pagination={pagination} />
           </div>
         </Col>
       </Row>

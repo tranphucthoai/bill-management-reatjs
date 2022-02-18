@@ -4,7 +4,7 @@ import { Dropdown, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import branchsApi from './../../api/branchsApi';
 import { logout } from '../../features/login/loginSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function SideBar() {
   const { userName } = useSelector((state) => state.loginUser);
@@ -13,22 +13,22 @@ function SideBar() {
   const navigate = useNavigate();
   useEffect(() => {
     (async () => {
-      const respone = await branchsApi.get(userName);
-      setUser(respone);
-      // console.log('respone', respone);
+      try {
+        const respone = await branchsApi.get(userName);
+        setUser(respone);
+      } catch (error) {}
     })();
   }, [userName]);
 
   const handleLogout = () => {
     dispatch(logout());
     localStorage.setItem('userName', '');
+    navigate('/login');
   };
 
   const handleLogin = () => {
     navigate('/login');
   };
-
-  // console.log('user', Object.keys(user));
 
   return (
     <aside className="sidebar">
@@ -89,11 +89,11 @@ function SideBar() {
           {userName.length > 0 && (
             <ul>
               <li>
-                <a href="">Về Trang Chủ</a>
+                <Link to={'/home'}>Về Trang Chủ</Link>
               </li>
               <li>|</li>
               <li>
-                <a href="">Đổi Mật Khẩu</a>
+                <Link href="">Đổi Mật Khẩu</Link>
               </li>
             </ul>
           )}

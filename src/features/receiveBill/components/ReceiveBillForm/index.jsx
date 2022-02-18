@@ -4,18 +4,16 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import receiveReceiptsApi from '../../../../api/receiveReceiptsApi';
+import receiveBillApi from '../../../../api/receiveBillApi';
 import RadioGroup from '../../../../components/formControls/RadioGroup/index';
 import SelectField from '../../../../components/formControls/SelectField';
 import TextField from '../../../../components/formControls/TextField/index';
 import { create, edit } from '../../receiveBillSlice';
-import saleCatalogApi from '../../../../api/saleCatalogApi';
 import ReceiveBillTable from './../ReceiveBillTable/index';
 import banksApi from './../../../../api/banksApi';
+import ToastNormal from '../../../../components/ToastNormal';
 
-ReceiveBillForm.propTypes = {};
-
-function ReceiveBillForm(props) {
+function ReceiveBillForm() {
   const [reLoad, setReload] = useState(false);
   const [statusSelected, setStatusSelected] = useState(0);
   const [paymentsSelected, setPaymentsSelected] = useState(0);
@@ -23,6 +21,8 @@ function ReceiveBillForm(props) {
   const { isUpdate, idItem } = useSelector((state) => state.receiveBill);
   const [selectVal, setSelectVal] = useState('');
   const [banks, setbank] = useState([]);
+  const [showToast, setShowToast] = useState(false);
+  const [fieldToast, setFieldToast] = useState({});
 
   //init formik
 
@@ -35,10 +35,11 @@ function ReceiveBillForm(props) {
     receiverName: '',
     receiverCardId: '',
     receiverAddress: '',
-    transferAmount: '',
-    transferFee: '',
     secretNumber: '',
-    paymentAmount: '',
+    subTotal: '',
+    fees: '',
+    grandTotal: '',
+    grandTotalText: '',
   };
 
   const formik = useFormik({
@@ -57,8 +58,8 @@ function ReceiveBillForm(props) {
         .required('Vui lòng nhập số CMND / Hộ chiếu'),
       receiverAddress: Yup.string().required('Vui lòng nhập địa chỉ'),
 
-      transferAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
-      transferFee: Yup.number().required('Vui lòng nhập lệ phí'),
+      subTotal: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
+      fees: Yup.number().required('Vui lòng nhập lệ phí'),
       secretNumber: Yup.number().required('Vui lòng nhập mã số bí mật'),
     }),
     onSubmit: async (values) => {
@@ -68,7 +69,7 @@ function ReceiveBillForm(props) {
       values.bankId = selectVal;
       values.formOfReceipt = paymentsSelected;
 
-      values.paymentAmount = values.transferAmount - values.transferFee;
+      values.grandTotal = values.subTotal - values.fees;
       values.isCheckDelete = true;
       values.createdBy = '';
       values.senderCardIdDateOfIssue = 0;
@@ -79,9 +80,19 @@ function ReceiveBillForm(props) {
       values.banks = selectVal;
 
       if (isUpdate) {
-        const respone = await receiveReceiptsApi.update(idItem, values);
+        try {
+          await receiveBillApi.update(idItem, values);
+        } catch (error) {
+          showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
+        }
+        showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công một trường');
       } else {
-        const respone = await receiveReceiptsApi.add(values);
+        try {
+          await receiveBillApi.add(values);
+        } catch (error) {
+          showToastItem('danger', 'Lỗi Quá Trình Thêm Mới !!!', error);
+        }
+        showToastItem('success', 'Thêm Thành Công', 'Đã thêm mới thành công một trường');
       }
       setReload((prev) => !prev);
       dispatch(create());
@@ -163,7 +174,13 @@ function ReceiveBillForm(props) {
   //handleDelete
 
   const handleDelete = async (id) => {
-    const respone = await receiveReceiptsApi.remove(id);
+    try {
+      await receiveBillApi.remove(id);
+    } catch (error) {
+      showToastItem('danger', 'Lỗi Quá Trình Xoá !!!', error);
+    }
+    showToastItem('success', 'Xoá Thành Công', 'Đã xoá thành công một trường');
+
     setReload((prev) => !prev);
 
     if (id === idItem) {
@@ -174,9 +191,14 @@ function ReceiveBillForm(props) {
   //handleEdit
 
   const handleEdit = async (id, checked) => {
-    const respone = await receiveReceiptsApi.update(id, {
-      status: checked,
-    });
+    try {
+      await receiveBillApi.update(id, {
+        status: checked,
+      });
+    } catch (error) {
+      showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
+    }
+    showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công trạng thái một trường');
     setReload((prev) => !prev);
   };
   //handleView
@@ -184,9 +206,7 @@ function ReceiveBillForm(props) {
   useEffect(() => {
     (async () => {
       try {
-        const fillVal = await receiveReceiptsApi.get(idItem);
-        console.log('fillVal', fillVal);
-
+        const fillVal = await receiveBillApi.get(idItem);
         formik.setValues(
           {
             senderPhone: fillVal.senderPhone,
@@ -198,29 +218,15 @@ function ReceiveBillForm(props) {
             receiverCardId: fillVal.receiverCardId,
             receiverAddress: fillVal.receiverAddress,
             bankPlusPhone: fillVal.bankPlusPhone,
-            transferAmount: fillVal.transferAmount,
-            transferFee: fillVal.transferFee,
+            subTotal: fillVal.subTotal,
+            fees: fillVal.fees,
             accountNumber: fillVal.accountNumber,
-            paymentAmount: fillVal.paymentAmount,
+            grandTotal: fillVal.grandTotal,
             secretNumber: fillVal.secretNumber,
-            paymentAmountText: VNnum2words(fillVal.paymentAmount).trim() + ' đồng',
+            grandTotalText: VNnum2words(fillVal.grandTotal).trim() + ' đồng',
           },
           true
         );
-        const newStatus = [
-          {
-            id: 0,
-            name: 'processed',
-            text: 'Đã xử lí',
-            isChecked: fillVal.status,
-          },
-          {
-            id: 1,
-            name: 'peding',
-            text: 'Chưa xử lý',
-            isChecked: !fillVal.status,
-          },
-        ];
         setSelectVal(fillVal.bankId);
         handleSelectedItem(fillVal.status, 'status');
         handleSelectedItem(fillVal.formOfReceipt, 'formPayments');
@@ -235,10 +241,26 @@ function ReceiveBillForm(props) {
     dispatch(edit(id));
   };
 
+  const calcGrandTotal = () => {
+    const subTotal = formik.values['subTotal'];
+    const fees = formik.values['fees'];
+    const grandTotal = subTotal - fees;
+    if (fees >= 0 && subTotal >= 0) {
+      formik.setValues(
+        (prev) => ({
+          ...prev,
+          grandTotal: grandTotal >= 0 ? grandTotal : 0,
+          grandTotalText: grandTotal >= 0 ? VNnum2words(grandTotal).trim() + ' đồng' : 0,
+        }),
+        false
+      );
+    }
+  };
+
   //reset form
   const resetForm = () => {
     formik.resetForm();
-    setSelectVal(banks[0]);
+    setSelectVal(banks[0].id);
     handleSelectedItem(0, 'status');
     handleSelectedItem(0, 'formPayments');
   };
@@ -247,10 +269,6 @@ function ReceiveBillForm(props) {
   useEffect(() => {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
-
-  const handleInputPaymentAmount = (e) => {
-    // console.log('e.target.value', e.target.value);
-  };
 
   const handleChangeSelect = (value) => {
     setSelectVal(value);
@@ -268,6 +286,19 @@ function ReceiveBillForm(props) {
       }
     })();
   }, []);
+
+  //show hide toast
+  const showToastItem = (type, title, massage) => {
+    setShowToast(true);
+    setFieldToast({
+      type,
+      title,
+      massage,
+    });
+  };
+  const handleHideToast = () => {
+    setShowToast(false);
+  };
 
   return (
     <>
@@ -351,18 +382,20 @@ function ReceiveBillForm(props) {
                     <TextField
                       type="number"
                       form={formik}
-                      name="transferAmount"
+                      name="subTotal"
                       icon={'fa fa-usd'}
                       placeholder={'Số tiền nhận'}
+                      customInput={calcGrandTotal}
                     />
                   </Col>
                   <Col md={6}>
                     <TextField
                       type="number"
                       form={formik}
-                      name="transferFee"
+                      name="fees"
                       icon={'fa fa-plus'}
                       placeholder={'Lệ phí'}
+                      customInput={calcGrandTotal}
                     />
                   </Col>
                 </Row>
@@ -372,10 +405,9 @@ function ReceiveBillForm(props) {
               readOnly={true}
               type="number"
               form={formik}
-              name="paymentAmount"
+              name="grandTotal"
               icon={'fa-pause'}
               placeholder={'Số tiền thanh toán'}
-              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
@@ -384,10 +416,9 @@ function ReceiveBillForm(props) {
             <TextField
               readOnly={true}
               form={formik}
-              name="paymentAmountText"
+              name="grandTotalText"
               icon={'fa-text-width'}
               placeholder={'Số tiền thanh toán bằng chữ'}
-              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
@@ -408,6 +439,7 @@ function ReceiveBillForm(props) {
         </Row>
       </form>
       <ReceiveBillTable handleEdit={handleEdit} handleDelete={handleDelete} handleView={handleView} reLoad={reLoad} />
+      <ToastNormal fieldToast={fieldToast} showToast={showToast} hideToast={handleHideToast} />
     </>
   );
 }

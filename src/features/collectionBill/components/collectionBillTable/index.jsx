@@ -1,12 +1,14 @@
+import moment from 'moment';
+import propTypes from 'prop-types';
+import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import collectionReceiptsApi from '../../../../api/collectionReceiptsApi';
+import collectionBillApi from '../../../../api/collectionBillApi';
 import TextFieldBtn from '../../../../components/formControls/TextFieldBtn/index';
+import Loader from '../../../../components/Loader';
+import PaginationNormal from '../../../../components/PaginationNormal';
 import { formatPrice } from './../../../../constans/common';
-import propTypes from 'prop-types';
-import queryString from 'query-string';
-import moment from 'moment';
 
 CollectionBillTable.propTypes = {
   reLoad: propTypes.bool,
@@ -17,6 +19,8 @@ CollectionBillTable.propTypes = {
 
 function CollectionBillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
   const [data, setData] = useState([]);
+  const [pagination, setPagination] = useState({});
+  const [loader, setLoader] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const params = queryString.parse(location.search);
@@ -24,23 +28,21 @@ function CollectionBillTable({ reLoad = false, handleDelete = null, handleEdit =
   const queryParams = useMemo(() => {
     return {
       phone_like: params.phone_like || '',
+      _page: params._page || 1,
+      _limit: params._limit || 5,
     };
   }, [location.search]);
-
-  const [filters, setFilters] = useState(() => ({
-    ...queryParams,
-    phone_like: '',
-  }));
 
   useEffect(() => {
     (async () => {
       try {
-        const respone = await collectionReceiptsApi.getAll(queryParams);
-        console.log('respone ok', respone);
-        setData(respone);
+        const { data, pagination } = await collectionBillApi.getAll(queryParams);
+        setData(data);
+        setPagination(pagination);
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
+      setLoader(false);
     })();
   }, [reLoad, queryParams]);
   const onView = (id) => {
@@ -58,10 +60,6 @@ function CollectionBillTable({ reLoad = false, handleDelete = null, handleEdit =
     handleEdit(id, checked);
   };
   const handleChange = (value) => {
-    setFilters((prev) => ({
-      ...prev,
-      phone_like: value,
-    }));
     const filters = {
       ...queryParams,
       phone_like: value,
@@ -73,13 +71,32 @@ function CollectionBillTable({ reLoad = false, handleDelete = null, handleEdit =
     });
   };
   const handleReset = () => {
-    setFilters({});
-    const filters = {};
+    const filters = {
+      ...queryParams,
+      phone_like: '',
+    };
     navigate({
       pathname: location.pathname,
       search: queryString.stringify(filters),
     });
   };
+
+  const handlePaginChange = (page) => {
+    const filters = {
+      ...queryParams,
+      _page: page,
+    };
+
+    navigate({
+      pathname: location.pathname,
+      search: queryString.stringify(filters),
+    });
+  };
+
+  //loader
+  if (loader) {
+    return <Loader />;
+  }
   return (
     <>
       <Row>
@@ -89,6 +106,7 @@ function CollectionBillTable({ reLoad = false, handleDelete = null, handleEdit =
               handleChange={handleChange}
               handleReset={handleReset}
               placeholder={'Nhập số điện thoại để tìm kiếm ...'}
+              fieldFilter={'phone_like'}
             />
             <Table responsive striped bordered hover className="table-normal">
               <thead>
@@ -127,11 +145,11 @@ function CollectionBillTable({ reLoad = false, handleDelete = null, handleEdit =
                       {item.serviceNumber}
                     </td>
                     <td>{moment(item.timeForPayment).format('MM-DD-YYYY')}</td>
-                    <td>{formatPrice(Number.parseInt(item.paymentAmount))}</td>
+                    <td>{formatPrice(Number.parseInt(item.totalAmount))}</td>
                     <td>
                       <div className="box-status">
                         <input
-                          onClick={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
+                          onChange={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
                           className="box-status__input"
                           id={`statusTable${item.id}`}
                           type="checkbox"
@@ -161,6 +179,8 @@ function CollectionBillTable({ reLoad = false, handleDelete = null, handleEdit =
                 ))}
               </tbody>
             </Table>
+
+            <PaginationNormal onChange={handlePaginChange} pagination={pagination} />
           </div>
         </Col>
       </Row>

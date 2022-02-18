@@ -4,10 +4,11 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import transferReceiptsApi from '../../../../api/transferReceiptsApi';
+import transferBillApi from '../../../../api/transferBillApi';
 import RadioGroup from '../../../../components/formControls/RadioGroup/index';
 import TextField from '../../../../components/formControls/TextField/index';
 import { create, edit } from '../../transferBillSlice';
+import ToastNormal from './../../../../components/ToastNormal/index';
 import TransferBillTable from './../TransferBillTable/index';
 
 function TransferBillForm() {
@@ -16,6 +17,8 @@ function TransferBillForm() {
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.transferBill);
+  const [showToast, setShowToast] = useState(false);
+  const [fieldToast, setFieldToast] = useState({});
 
   //init formik
 
@@ -29,10 +32,11 @@ function TransferBillForm() {
     receiverCardId: '',
     receiverAddress: '',
     bankPlusPhone: '',
-    transferAmount: '',
-    transferFee: '',
     accountNumber: '',
-    paymentAmount: '',
+    subTotal: 0,
+    fees: 0,
+    grandTotal: '',
+    grandTotalText: '',
   };
 
   const formik = useFormik({
@@ -52,14 +56,14 @@ function TransferBillForm() {
       receiverAddress: Yup.string().required('Vui lòng nhập địa chỉ'),
 
       bankPlusPhone: Yup.number().min(10, 'Số điện thoại ít nhất 10 chữ số').required('Vui lòng nhập số điện thoại'),
-      transferAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
-      transferFee: Yup.number().required('Vui lòng nhập lệ phí'),
+      subTotal: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
+      fees: Yup.number().required('Vui lòng nhập lệ phí'),
       accountNumber: Yup.number()
         .min(10, 'Vui lòng nhập Số tài khoản / Số thẻ')
         .required('Vui lòng nhập Số tài khoản / Số thẻ'),
     }),
     onSubmit: async (values) => {
-      values.paymentAmount = values.transferAmount - values.transferFee;
+      values.grandTotal = values.subTotal - values.fees;
       values.formOfReceipt = paymentsSelected;
       values.status = statusSelected;
       values.branchId = localStorage.getItem('userID');
@@ -70,17 +74,27 @@ function TransferBillForm() {
       values.receiverCardIdDateOfIssue = 0;
       values.receiverCardIdPlaceOfIssue = values.receiverAddress;
       if (isUpdate) {
-        const respone = await transferReceiptsApi.update(idItem, values);
+        try {
+          await transferBillApi.update(idItem, values);
+        } catch (error) {
+          showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
+        }
+        showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công một trường');
       } else {
-        const respone = await transferReceiptsApi.add(values);
+        try {
+          await transferBillApi.add(values);
+        } catch (error) {
+          showToastItem('danger', 'Lỗi Quá Trình Thêm Mới !!!', error);
+        }
+        showToastItem('success', 'Thêm Thành Công', 'Đã thêm mới thành công một trường');
       }
       setReload((prev) => !prev);
       dispatch(create());
-      formik.resetForm();
+      resetForm();
     },
   });
 
-  //init values (status or form payments)
+  //init values
 
   const [formOfReceipt, setFormOfReceipt] = useState([
     {
@@ -119,7 +133,6 @@ function TransferBillForm() {
   ]);
 
   //handle Selected Item (status or formPayments)
-
   const handleSelectedItem = (index = 0, nameGroup) => {
     if (nameGroup === 'status') {
       const newStatus = [...status];
@@ -144,37 +157,43 @@ function TransferBillForm() {
   };
 
   //handleAdd
-
   const handleAdd = () => {
     dispatch(create());
-    formik.resetForm();
+    resetForm();
   };
 
   //handleDelete
-
   const handleDelete = async (id) => {
-    const respone = await transferReceiptsApi.remove(id);
+    try {
+      await transferBillApi.remove(id);
+    } catch (error) {
+      showToastItem('danger', 'Lỗi Quá Trình Xoá !!!', error);
+    }
+    showToastItem('success', 'Xoá Thành Công', 'Đã xoá thành công một trường');
     setReload((prev) => !prev);
-
     if (id === idItem) {
       handleAdd();
     }
   };
-  //handleEdit
 
+  //handleEdit
   const handleEdit = async (id, checked) => {
-    const respone = await transferReceiptsApi.update(id, {
-      status: checked,
-    });
+    try {
+      await transferBillApi.update(id, {
+        status: checked,
+      });
+    } catch (error) {
+      showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
+    }
+    showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công trạng thái một trường');
     setReload((prev) => !prev);
   };
 
   //handleView
-
   useEffect(() => {
     (async () => {
       try {
-        const fillVal = await transferReceiptsApi.get(idItem);
+        const fillVal = await transferBillApi.get(idItem);
 
         formik.setValues(
           {
@@ -182,34 +201,21 @@ function TransferBillForm() {
             senderName: fillVal.senderName,
             senderCardId: fillVal.senderCardId,
             senderAddress: fillVal.senderAddress,
+
             receiverPhone: fillVal.receiverPhone,
             receiverName: fillVal.receiverName,
             receiverCardId: fillVal.receiverCardId,
             receiverAddress: fillVal.receiverAddress,
+
             bankPlusPhone: fillVal.bankPlusPhone,
-            transferAmount: fillVal.transferAmount,
-            transferFee: fillVal.transferFee,
+            subTotal: fillVal.subTotal,
+            fees: fillVal.fees,
             accountNumber: fillVal.accountNumber,
-            paymentAmount: fillVal.paymentAmount,
-            paymentAmountText: VNnum2words(fillVal.paymentAmount),
+            grandTotal: fillVal.grandTotal,
+            grandTotalText: VNnum2words(fillVal.grandTotal).trim() + ' đồng',
           },
           true
         );
-        const newStatus = [
-          {
-            id: 0,
-            name: 'processed',
-            text: 'Đã xử lí',
-            isChecked: fillVal.status,
-          },
-          {
-            id: 1,
-            name: 'peding',
-            text: 'Chưa xử lý',
-            isChecked: !fillVal.status,
-          },
-        ];
-
         handleSelectedItem(fillVal.status, 'status');
         handleSelectedItem(fillVal.formOfReceipt, 'formPayments');
       } catch (error) {
@@ -223,38 +229,45 @@ function TransferBillForm() {
     dispatch(edit(id));
   };
 
-  //scroll top
+  //reset form
+  const resetForm = () => {
+    formik.resetForm();
+    handleSelectedItem(0, 'status');
+    handleSelectedItem(0, 'formPayments');
+  };
 
+  //scroll top
   useEffect(() => {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
 
-  // const handleInputTransferAmount = (e, valueTransferAmount, valueTransferFee) => {
-  //   if (valueTransferFee) {
-  //     const newValue = Number.parseInt(e.target.value) - valueTransferFee;
-  //     formik.setValues(
-  //       {
-  //         paymentAmountText: VNnum2words(newValue),
-  //         paymentAmount: newValue,
-  //       },
-  //       false
-  //     );
-  //   }
-  // };
-  const handleInputTransferFee = (e, valueTransferAmount, valueTransferFee) => {
-    if (valueTransferAmount) {
-      const newValue = valueTransferAmount - Number.parseInt(e.target.value);
+  const calcGrandTotal = () => {
+    const subTotal = formik.values['subTotal'];
+    const fees = formik.values['fees'];
+    const grandTotal = subTotal - fees;
+    if (fees >= 0 && subTotal >= 0) {
       formik.setValues(
-        {
-          paymentAmountText: VNnum2words(newValue),
-          paymentAmount: newValue,
-        },
+        (prev) => ({
+          ...prev,
+          grandTotal: grandTotal >= 0 ? grandTotal : 0,
+          grandTotalText: grandTotal >= 0 ? VNnum2words(grandTotal).trim() + ' đồng' : 0,
+        }),
         false
       );
     }
   };
-  const handleInputPaymentAmount = (e) => {
-    console.log('e.target.value', e.target.value);
+
+  //show hide toast
+  const showToastItem = (type, title, massage) => {
+    setShowToast(true);
+    setFieldToast({
+      type,
+      title,
+      massage,
+    });
+  };
+  const handleHideToast = () => {
+    setShowToast(false);
   };
 
   return (
@@ -327,20 +340,20 @@ function TransferBillForm() {
                 <TextField
                   type="number"
                   form={formik}
-                  name="transferAmount"
+                  name="subTotal"
                   icon={'fa-money'}
                   placeholder={'Số tiền muốn chuyển'}
-                  // customInput={handleInputTransferAmount}
+                  customInput={calcGrandTotal}
                 />
               </Col>
               <Col md={6}>
                 <TextField
                   type="number"
                   form={formik}
-                  name="transferFee"
+                  name="fees"
                   icon={'fa-plus'}
                   placeholder={'Lệ phí'}
-                  customInput={handleInputTransferFee}
+                  customInput={calcGrandTotal}
                 />
               </Col>
             </Row>
@@ -358,10 +371,9 @@ function TransferBillForm() {
               readOnly={true}
               type="number"
               form={formik}
-              name="paymentAmount"
+              name="grandTotal"
               icon={'fa-pause'}
               placeholder={'Số tiền thanh toán'}
-              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
@@ -370,10 +382,9 @@ function TransferBillForm() {
             <TextField
               readOnly={true}
               form={formik}
-              name="paymentAmountText"
+              name="grandTotalText"
               icon={'fa-text-width'}
               placeholder={'Số tiền thanh toán bằng chữ'}
-              customInput={handleInputPaymentAmount}
             />
           </Col>
         </Row>
@@ -394,6 +405,7 @@ function TransferBillForm() {
         </Row>
       </form>
       <TransferBillTable handleEdit={handleEdit} handleDelete={handleDelete} handleView={handleView} reLoad={reLoad} />
+      <ToastNormal fieldToast={fieldToast} showToast={showToast} hideToast={handleHideToast} />
     </>
   );
 }

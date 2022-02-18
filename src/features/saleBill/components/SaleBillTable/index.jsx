@@ -1,13 +1,14 @@
+import moment from 'moment';
+import propTypes from 'prop-types';
+import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import saleReceiptsApi from '../../../../api/saleBillApi';
 import TextFieldBtn from '../../../../components/formControls/TextFieldBtn/index';
+import Loader from '../../../../components/Loader';
+import PaginationNormal from './../../../../components/PaginationNormal/index';
 import { formatPrice } from './../../../../constans/common';
-import propTypes from 'prop-types';
-import queryString from 'query-string';
-import moment from 'moment';
-import PaginationNormal from './../../../../components/formControls/PaginationNormal/index';
 
 SaleBillTable.propTypes = {
   reLoad: propTypes.bool,
@@ -19,6 +20,7 @@ SaleBillTable.propTypes = {
 function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({});
+  const [loader, setLoader] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const params = queryString.parse(location.search);
@@ -40,6 +42,7 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
+      setLoader(false);
     })();
   }, [reLoad, queryParams]);
 
@@ -77,7 +80,6 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
       search: queryString.stringify(filters),
     });
   };
-
   const handlePaginChange = (page) => {
     const filters = {
       ...queryParams,
@@ -89,6 +91,11 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
       search: queryString.stringify(filters),
     });
   };
+
+  //loader
+  if (loader) {
+    return <Loader />;
+  }
   return (
     <>
       <Row>
@@ -138,7 +145,7 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
                     <td>
                       {item.quantity} x {formatPrice(item.price)}
                     </td>
-                    <td>{formatPrice(item.totalMoney)}</td>
+                    <td>{formatPrice(item.totalAmount)}</td>
                     <td>
                       <div className="box-status">
                         <input

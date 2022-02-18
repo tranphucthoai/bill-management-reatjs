@@ -13,15 +13,13 @@ import SaleBillTable from '../SaleBillTable/index';
 import saleCatalogApi from './../../../../api/saleCatalogApi';
 import ToastNormal from './../../../../components/ToastNormal/index';
 
-SaleBillForm.propTypes = {};
-
-function SaleBillForm(props) {
+function SaleBillForm() {
   const [reLoad, setReload] = useState(false);
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.saleBill);
   const [saleCatalogs, setSaleCatalogs] = useState([]);
-  const [selectVal, setSelectVal] = useState('CardViettle');
+  const [selectVal, setSelectVal] = useState('CardMobi');
   const [showToast, setShowToast] = useState(false);
   const [fieldToast, setFieldToast] = useState({});
 
@@ -33,8 +31,8 @@ function SaleBillForm(props) {
     productNumber: '',
     quantity: '',
     price: '',
-    totalMoneyText: '',
-    totalMoney: '',
+    totalAmountText: '',
+    totalAmount: '',
   };
 
   const formik = useFormik({
@@ -51,7 +49,7 @@ function SaleBillForm(props) {
       price: Yup.number().required('Vui lòng nhập số tiền'),
     }),
     onSubmit: async (values) => {
-      values.totalMoney = values.quantity * values.price;
+      values.totalAmount = values.quantity * values.price;
       values.status = statusSelected;
       values.branchId = localStorage.getItem('userID');
       values.isCheckDelete = true;
@@ -63,7 +61,7 @@ function SaleBillForm(props) {
         } catch (error) {
           showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
         }
-        showToastItem('success', 'Thêm Thành Công', 'Đã cập nhật thành công một trường');
+        showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công một trường');
       } else {
         try {
           await saleReceiptsApi.add(values);
@@ -110,8 +108,8 @@ function SaleBillForm(props) {
 
   //handleAdd
   const handleAdd = () => {
+    dispatch(edit(''));
     dispatch(create());
-    // formik.resetForm();
     resetForm();
   };
 
@@ -123,9 +121,7 @@ function SaleBillForm(props) {
       showToastItem('danger', 'Lỗi Quá Trình Xoá !!!', error);
     }
     showToastItem('success', 'Xoá Thành Công', 'Đã xoá thành công một trường');
-
     setReload((prev) => !prev);
-
     if (id === idItem) {
       handleAdd();
     }
@@ -159,8 +155,8 @@ function SaleBillForm(props) {
             quantity: fillVal.quantity,
             price: fillVal.price,
 
-            totalMoney: fillVal.totalMoney,
-            totalMoneyText: VNnum2words(fillVal.totalMoney).trim() + ' đồng',
+            totalAmount: fillVal.totalAmount,
+            totalAmountText: VNnum2words(fillVal.totalAmount).trim() + ' đồng',
           },
           true
         );
@@ -173,7 +169,6 @@ function SaleBillForm(props) {
   }, [idItem]);
 
   const handleView = (id) => {
-    dispatch(edit(''));
     dispatch(edit(id));
   };
 
@@ -190,16 +185,16 @@ function SaleBillForm(props) {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
 
-  const calcTotalMoney = () => {
-    const totalMoney = formik.values['price'] * formik.values['quantity'];
+  const calcTotalAmount = () => {
+    const totalAmount = formik.values['price'] * formik.values['quantity'];
     const price = formik.values['price'];
     const quantity = formik.values['quantity'];
     if (price >= 0 && quantity >= 0) {
       formik.setValues(
         (prev) => ({
           ...prev,
-          totalMoney: totalMoney >= 0 ? totalMoney : '',
-          totalMoneyText: totalMoney >= 0 ? VNnum2words(totalMoney).trim() + ' đồng' : '',
+          totalAmount: totalAmount >= 0 ? totalAmount : '',
+          totalAmountText: totalAmount >= 0 ? VNnum2words(totalAmount).trim() + ' đồng' : '',
         }),
         false
       );
@@ -209,8 +204,8 @@ function SaleBillForm(props) {
   const handleChangeSelect = (value) => {
     setSelectVal(value);
   };
-  //call api catalog products
 
+  //call api catalog products
   useEffect(() => {
     (async () => {
       try {
@@ -222,7 +217,7 @@ function SaleBillForm(props) {
     })();
   }, []);
 
-  //show toast
+  //show hide toast
   const showToastItem = (type, title, massage) => {
     setShowToast(true);
     setFieldToast({
@@ -276,7 +271,7 @@ function SaleBillForm(props) {
                   icon={'fa-calculator'}
                   placeholder={'Số lượng'}
                   type="number"
-                  customInput={calcTotalMoney}
+                  customInput={calcTotalAmount}
                 />
               </Col>
               <Col md={6}>
@@ -286,7 +281,7 @@ function SaleBillForm(props) {
                   type="number"
                   icon={'fa-money'}
                   placeholder={'Đơn giá'}
-                  customInput={calcTotalMoney}
+                  customInput={calcTotalAmount}
                 />
               </Col>
             </Row>
@@ -299,7 +294,7 @@ function SaleBillForm(props) {
               readOnly={true}
               type="number"
               form={formik}
-              name="totalMoney"
+              name="totalAmount"
               icon={'fa-pause'}
               placeholder={'Số tiền thanh toán'}
             />
@@ -310,7 +305,7 @@ function SaleBillForm(props) {
             <TextField
               readOnly={true}
               form={formik}
-              name="totalMoneyText"
+              name="totalAmountText"
               icon={'fa-text-width'}
               placeholder={'Số tiền thanh toán bằng chữ'}
             />

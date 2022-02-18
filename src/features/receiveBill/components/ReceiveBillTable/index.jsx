@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import receiveReceiptsApi from '../../../../api/receiveReceiptsApi';
+import receiveReceiptsApi from '../../../../api/receiveBillApi';
 import TextFieldBtn from '../../../../components/formControls/TextFieldBtn/index';
 import { formatPrice } from './../../../../constans/common';
 import propTypes from 'prop-types';
 import queryString from 'query-string';
 import moment from 'moment';
+import Loader from '../../../../components/Loader';
+import PaginationNormal from '../../../../components/PaginationNormal';
 
 ReceiveBillTable.propTypes = {
   reLoad: propTypes.bool,
@@ -17,31 +19,30 @@ ReceiveBillTable.propTypes = {
 
 function ReceiveBillTable({ reLoad = false, handleDelete = null, handleEdit = null, handleView = null }) {
   const [data, setData] = useState([]);
+  const [pagination, setPagination] = useState({});
+  const [loader, setLoader] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const params = queryString.parse(location.search);
 
   const queryParams = useMemo(() => {
     return {
-      senderPhone_like: params.senderPhone_like || '',
+      receiverPhone_like: params.receiverPhone_like || '',
+      _page: params._page || 1,
+      _limit: params._limit || 5,
     };
   }, [location.search]);
-
-  const [filters, setFilters] = useState(() => ({
-    ...queryParams,
-    senderPhone_like: '',
-  }));
 
   useEffect(() => {
     (async () => {
       try {
-        const respone = await receiveReceiptsApi.getAll(queryParams);
-        console.log('respone respone', respone);
-
-        setData(respone);
+        const { data, pagination } = await receiveReceiptsApi.getAll(queryParams);
+        setData(data);
+        setPagination(pagination);
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
+      setLoader(false);
     })();
   }, [reLoad, queryParams]);
   const onView = (id) => {
@@ -59,13 +60,9 @@ function ReceiveBillTable({ reLoad = false, handleDelete = null, handleEdit = nu
     handleEdit(id, checked);
   };
   const handleChange = (value) => {
-    setFilters((prev) => ({
-      ...prev,
-      senderPhone_like: value,
-    }));
     const filters = {
       ...queryParams,
-      senderPhone_like: value,
+      receiverPhone_like: value,
     };
 
     navigate({
@@ -74,13 +71,32 @@ function ReceiveBillTable({ reLoad = false, handleDelete = null, handleEdit = nu
     });
   };
   const handleReset = () => {
-    setFilters({});
-    const filters = {};
+    const filters = {
+      ...queryParams,
+      receiverPhone_like: '',
+    };
     navigate({
       pathname: location.pathname,
       search: queryString.stringify(filters),
     });
   };
+
+  const handlePaginChange = (page) => {
+    const filters = {
+      ...queryParams,
+      _page: page,
+    };
+
+    navigate({
+      pathname: location.pathname,
+      search: queryString.stringify(filters),
+    });
+  };
+
+  //loader
+  if (loader) {
+    return <Loader />;
+  }
   return (
     <>
       <Row>
@@ -90,6 +106,7 @@ function ReceiveBillTable({ reLoad = false, handleDelete = null, handleEdit = nu
               handleChange={handleChange}
               handleReset={handleReset}
               placeholder={'Nhập số điện thoại để tìm kiếm ...'}
+              fieldFilter={'receiverPhone_like'}
             />
             <Table responsive striped bordered hover className="table-normal">
               <thead>
@@ -130,14 +147,18 @@ function ReceiveBillTable({ reLoad = false, handleDelete = null, handleEdit = nu
                       {item.receiverAddress}
                     </td>
                     <td>
-                      {formatPrice(Number.parseInt(item.transferAmount))} <br />
-                      {formatPrice(Number.parseInt(item.transferFee))}
+                      {formatPrice(Number.parseInt(item.subTotal))} <br />
+                      {formatPrice(Number.parseInt(item.fees))}
                     </td>
-                    <td>{formatPrice(Number.parseInt(item.paymentAmount))}</td>
+                    <td>
+                      {formatPrice(Number.parseInt(item.grandTotal))}
+                      <br />
+                      {moment(item.createdAt).format('MM-DD-YYYY')}
+                    </td>
                     <td>
                       <div className="box-status">
                         <input
-                          onClick={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
+                          onChange={(e) => onEdit(item.id, e.target.checked ? 0 : 1)}
                           className="box-status__input"
                           id={`statusTable${item.id}`}
                           type="checkbox"
@@ -167,6 +188,7 @@ function ReceiveBillTable({ reLoad = false, handleDelete = null, handleEdit = nu
                 ))}
               </tbody>
             </Table>
+            <PaginationNormal onChange={handlePaginChange} pagination={pagination} />
           </div>
         </Col>
       </Row>

@@ -1,17 +1,18 @@
 import 'font-awesome/css/font-awesome.min.css';
 import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import './app.scss';
 import SideBar from './components/SideBar';
+import CollectionBill from './features/collectionBill/pages/index';
 import Home from './features/home/pages';
 import Login from './features/login/pages';
-import TransferBill from './features/transferBill/pages';
-import SaleBill from './features/saleBill/pages/index';
-import CollectionBill from './features/collectionBill/pages/index';
 import ReceiveBill from './features/receiveBill/pages/index';
+import SaleBill from './features/saleBill/pages/index';
+import TransferBill from './features/transferBill/pages';
 
 function App() {
+  const userName = localStorage.getItem('userName');
   return (
     <main className="main">
       <Container fluid>

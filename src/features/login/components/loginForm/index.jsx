@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Container, Row, Col, FormControl, Form, InputGroup, Button } from 'react-bootstrap';
-import TextField from './../../../../components/formControls/TextField/index';
 import { useFormik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { Button, Col, Container, Row } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import './style.scss';
+import Loader from '../../../../components/Loader';
+import { login } from '../../loginSlice';
 import branchsApi from './../../../../api/branchsApi';
 import SelectField from './../../../../components/formControls/SelectField/index';
-import { useDispatch } from 'react-redux';
-import { login } from '../../loginSlice';
-import { useNavigate } from 'react-router-dom';
-LoginForm.propTypes = {};
+import TextField from './../../../../components/formControls/TextField/index';
+import './style.scss';
 
-function LoginForm(props) {
+function LoginForm() {
   const [branchs, setBranchs] = useState([]);
   const [selectVal, setSelectVal] = useState('TruongTho');
+  const [loader, setLoader] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const formik = useFormik({
@@ -44,11 +44,17 @@ function LoginForm(props) {
       } catch (error) {
         console.log('Failed to fetch api', error);
       }
+      setLoader(false);
     })();
   }, []);
   const handleChangeSelect = (value) => {
     setSelectVal(value);
   };
+
+  if (loader) {
+    return <Loader />;
+  }
+
   return (
     <Container>
       <Row className="justify-content-center">

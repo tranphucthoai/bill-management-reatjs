@@ -4,37 +4,36 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import collectionReceiptsApi from '../../../../api/collectionReceiptsApi';
+import collectionBillApi from '../../../../api/collectionBillApi';
 import RadioGroup from '../../../../components/formControls/RadioGroup/index';
 import SelectField from '../../../../components/formControls/SelectField';
 import TextField from '../../../../components/formControls/TextField/index';
+import ToastNormal from '../../../../components/ToastNormal';
 import { create, edit } from '../../collectionBillSlice';
-import CollectionBillTable from './../collectionBillTable/index';
 import collectionCatalogApi from './../../../../api/collectionCatalogApi';
+import CollectionBillTable from './../collectionBillTable/index';
 
-CollectionBillForm.propTypes = {};
-
-function CollectionBillForm(props) {
+function CollectionBillForm() {
   const [reLoad, setReload] = useState(false);
   const [statusSelected, setStatusSelected] = useState(0);
   const dispatch = useDispatch();
   const { isUpdate, idItem } = useSelector((state) => state.collectionBill);
   const [collectionCatalogs, setCollectionCatalogs] = useState([]);
   const [selectVal, setSelectVal] = useState('');
+  const [fieldToast, setFieldToast] = useState({});
+  const [showToast, setShowToast] = useState(false);
 
   //init formik
-
   const initValForm = {
     phone: '',
     name: '',
     address: '',
     price: '',
     serviceNumber: '',
-    paymentAmount: '',
     timeForPayment: 0,
-    paymentAmountText: '',
+    totalAmount: '',
+    totalAmountText: '',
   };
-  const currentDate = new Date(Date.now()).toISOString().slice(0, 10);
 
   const formik = useFormik({
     initialValues: initValForm,
@@ -43,9 +42,8 @@ function CollectionBillForm(props) {
       name: Yup.string().min(5, 'Vui lòng nhập họ và tên').required('Vui lòng nhập họ và tên'),
       address: Yup.string().required('Vui lòng nhập địa chỉ'),
       serviceNumber: Yup.string().min(4, 'Vui lòng nhập hơn 4 kí tự').required('Vui lòng nhập số hợp đồng'),
-      paymentAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
+      totalAmount: Yup.number().min(4, 'Vui lòng nhập số tiền').required('Vui lòng nhập số tiền'),
       timeForPayment: Yup.date().min(1, 'Vui lòng nhập thời gian'),
-      paymentAmountText: Yup.string(),
     }),
     onSubmit: async (values) => {
       values.status = statusSelected;
@@ -54,19 +52,27 @@ function CollectionBillForm(props) {
       values.collectionCatalogId = selectVal;
 
       if (isUpdate) {
-        const respone = await collectionReceiptsApi.update(idItem, values);
+        try {
+          await collectionBillApi.update(idItem, values);
+        } catch (error) {
+          showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
+        }
+        showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công một trường');
       } else {
-        const respone = await collectionReceiptsApi.add(values);
+        try {
+          await collectionBillApi.add(values);
+        } catch (error) {
+          showToastItem('danger', 'Lỗi Quá Trình Thêm Mới !!!', error);
+        }
+        showToastItem('success', 'Thêm Thành Công', 'Đã thêm mới thành công một trường');
       }
-
       setReload((prev) => !prev);
       dispatch(create());
-
       resetForm();
     },
   });
 
-  //init values (status or form payments)
+  //init values status
   const [status, setStatus] = useState([
     {
       id: 0,
@@ -83,7 +89,6 @@ function CollectionBillForm(props) {
   ]);
 
   //handle Selected Item (status or formPayments)
-
   const handleSelectedItem = (index = 0, nameGroup) => {
     if (nameGroup === 'status') {
       const newStatus = [...status];
@@ -98,7 +103,6 @@ function CollectionBillForm(props) {
   };
 
   //handleAdd
-
   const handleAdd = () => {
     dispatch(edit(''));
     dispatch(create());
@@ -106,61 +110,49 @@ function CollectionBillForm(props) {
   };
 
   //handleDelete
-
   const handleDelete = async (id) => {
-    const respone = await collectionReceiptsApi.remove(id);
+    try {
+      await collectionBillApi.remove(id);
+    } catch (error) {
+      showToastItem('danger', 'Lỗi Quá Trình Xoá !!!', error);
+    }
+    showToastItem('success', 'Xoá Thành Công', 'Đã xoá thành công một trường');
     setReload((prev) => !prev);
-
     if (id === idItem) {
       handleAdd();
     }
   };
-  //handleEdit
 
+  //handleEdit
   const handleEdit = async (id, checked) => {
-    const respone = await collectionReceiptsApi.update(id, {
-      status: checked,
-    });
+    try {
+      await collectionBillApi.update(id, {
+        status: checked,
+      });
+    } catch (error) {
+      showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
+    }
+    showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công trạng thái một trường');
     setReload((prev) => !prev);
   };
-  //handleView
 
+  //handleView
   useEffect(() => {
     (async () => {
       try {
-        const fillVal = await collectionReceiptsApi.get(idItem);
-        console.log('fillVal', fillVal);
-
+        const fillVal = await collectionBillApi.get(idItem);
         formik.setValues(
           {
             serviceNumber: fillVal.serviceNumber,
-
             phone: fillVal.phone,
             name: fillVal.name,
             address: fillVal.address,
-
-            // timeForPayment: fillVal.timeForPayment === 0 ? Date().toISOString().subStr(0, 10) : fillVal.timeForPayment,
             timeForPayment: fillVal.timeForPayment,
-
-            paymentAmount: fillVal.paymentAmount,
-            paymentAmountText: VNnum2words(fillVal.paymentAmount).trim() + ' đồng',
+            totalAmount: fillVal.totalAmount,
+            totalAmountText: VNnum2words(fillVal.totalAmount).trim() + ' đồng',
           },
           true
         );
-        const newStatus = [
-          {
-            id: 0,
-            name: 'processed',
-            text: 'Đã xử lí',
-            isChecked: fillVal.status,
-          },
-          {
-            id: 1,
-            name: 'peding',
-            text: 'Chưa xử lý',
-            isChecked: !fillVal.status,
-          },
-        ];
         setSelectVal(fillVal.collectionCatalogId);
         handleSelectedItem(fillVal.status, 'status');
       } catch (error) {
@@ -176,20 +168,31 @@ function CollectionBillForm(props) {
   //reset form
   const resetForm = () => {
     formik.resetForm();
-    setSelectVal(collectionCatalogs[0]);
+    setSelectVal(collectionCatalogs[0].id);
     handleSelectedItem(0, 'status');
   };
-  //scroll top
 
+  //scroll top
   useEffect(() => {
     window.scroll({ top: 0, behavior: 'smooth' });
   }, [idItem]);
 
+  const convertTotalAmount = () => {
+    const totalAmount = formik.values['totalAmount'];
+    formik.setValues(
+      (prev) => ({
+        ...prev,
+        totalAmountText: totalAmount >= 0 ? VNnum2words(totalAmount).trim() + ' đồng' : '',
+      }),
+      false
+    );
+  };
+
   const handleChangeSelect = (value) => {
     setSelectVal(value);
   };
-  //call api catalog products
 
+  //call api catalog products
   useEffect(() => {
     (async () => {
       try {
@@ -200,6 +203,19 @@ function CollectionBillForm(props) {
       }
     })();
   }, []);
+
+  //show hide toast
+  const showToastItem = (type, title, massage) => {
+    setShowToast(true);
+    setFieldToast({
+      type,
+      title,
+      massage,
+    });
+  };
+  const handleHideToast = () => {
+    setShowToast(false);
+  };
 
   return (
     <>
@@ -249,9 +265,10 @@ function CollectionBillForm(props) {
             <TextField
               type="number"
               form={formik}
-              name="paymentAmount"
+              name="totalAmount"
               icon={'fa-pause'}
               placeholder={'Số tiền thanh toán'}
+              customInput={convertTotalAmount}
             />
           </Col>
         </Row>
@@ -260,7 +277,7 @@ function CollectionBillForm(props) {
             <TextField
               readOnly={true}
               form={formik}
-              name="paymentAmountText"
+              name="totalAmountText"
               icon={'fa-text-width'}
               placeholder={'Số tiền thanh toán bằng chữ'}
             />
@@ -287,6 +304,7 @@ function CollectionBillForm(props) {
         handleView={handleView}
         reLoad={reLoad}
       />
+      <ToastNormal fieldToast={fieldToast} showToast={showToast} hideToast={handleHideToast} />
     </>
   );
 }

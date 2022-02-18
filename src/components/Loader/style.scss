@@ -1,0 +1,93 @@
+$base: #263238;
+$lite: #fff;
+$brand: #ff3d00;
+$size: 48px;
+
+.loader {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s linear;
+  background-color: #064e89;
+  &__item {
+    width: $size;
+    height: $size;
+    display: inline-block;
+    position: relative;
+    transform: rotate(45deg);
+    &::before {
+      content: '';
+      width: $size/2;
+      height: $size/2;
+      position: absolute;
+      left: 0;
+      top: -($size/2);
+      animation: animloader59 4s ease infinite;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: $size/2;
+      height: $size/2;
+      background: rgba($lite, 0.85);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      animation: animloader56 2s ease infinite;
+    }
+  }
+}
+
+@keyframes animloader59 {
+  0% {
+    box-shadow: 0 24px rgba($lite, 0), 24px 24px rgba($lite, 0), 24px 48px rgba($lite, 0), 0px 48px rgba($lite, 0);
+  }
+  12% {
+    box-shadow: 0 24px rgba($lite, 1), 24px 24px rgba($lite, 0), 24px 48px rgba($lite, 0), 0px 48px rgba($lite, 0);
+  }
+  25% {
+    box-shadow: 0 24px rgba($lite, 1), 24px 24px rgba($lite, 1), 24px 48px rgba($lite, 0), 0px 48px rgba($lite, 0);
+  }
+  37% {
+    box-shadow: 0 24px rgba($lite, 1), 24px 24px rgba($lite, 1), 24px 48px rgba($lite, 1), 0px 48px rgba($lite, 0);
+  }
+  50% {
+    box-shadow: 0 24px rgba($lite, 1), 24px 24px rgba($lite, 1), 24px 48px rgba($lite, 1), 0px 48px rgba($lite, 1);
+  }
+  62% {
+    box-shadow: 0 24px rgba($lite, 0), 24px 24px rgba($lite, 1), 24px 48px rgba($lite, 1), 0px 48px rgba($lite, 1);
+  }
+  75% {
+    box-shadow: 0 24px rgba($lite, 0), 24px 24px rgba($lite, 0), 24px 48px rgba($lite, 1), 0px 48px rgba($lite, 1);
+  }
+  87% {
+    box-shadow: 0 24px rgba($lite, 0), 24px 24px rgba($lite, 0), 24px 48px rgba($lite, 0), 0px 48px rgba($lite, 1);
+  }
+  100% {
+    box-shadow: 0 24px rgba($lite, 0), 24px 24px rgba($lite, 0), 24px 48px rgba($lite, 0), 0px 48px rgba($lite, 0);
+  }
+}
+
+@keyframes animloader56 {
+  0% {
+    transform: translate(0, 0) rotateX(0) rotateY(0);
+  }
+  25% {
+    transform: translate(100%, 0) rotateX(0) rotateY(180deg);
+  }
+  50% {
+    transform: translate(100%, 100%) rotateX(-180deg) rotateY(180deg);
+  }
+  75% {
+    transform: translate(0, 100%) rotateX(-180deg) rotateY(360deg);
+  }
+  100% {
+    transform: translate(0, 0) rotateX(0) rotateY(360deg);
+  }
+}

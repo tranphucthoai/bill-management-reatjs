@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
-import React, { useRef, useState } from 'react';
+import queryString from 'query-string';
+import React, { useState } from 'react';
 import { Button, FormControl, InputGroup } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import './style.scss';
-import queryString from 'query-string';
 
 TextFieldBtn.propTypes = {
   handleChange: PropTypes.func,
