@@ -163,7 +163,7 @@ function ReceiveBillTable({ reLoad = false, handleDelete = null, handleEdit = nu
                           id={`statusTable${item.id}`}
                           type="checkbox"
                           hidden
-                          checked={item.status == 0 ? true : false}
+                          checked={item.status === 0 ? true : false}
                         />
                         <label className="box-status__label" htmlFor={`statusTable${item.id}`}>
                           <i className="fa"></i>
