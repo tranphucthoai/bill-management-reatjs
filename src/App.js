@@ -1,7 +1,6 @@
 import 'font-awesome/css/font-awesome.min.css';
 import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
 import './app.scss';
 import SideBar from './components/SideBar';
@@ -13,8 +12,6 @@ import SaleBill from './features/saleBill/pages/index';
 import TransferBill from './features/transferBill/pages';
 
 function App() {
-  // const { userName } = useSelector((state) => state.loginUser);
-
   return (
     <main className="main">
       <Container fluid>
