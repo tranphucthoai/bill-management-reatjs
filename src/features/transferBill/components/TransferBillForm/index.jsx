@@ -280,9 +280,9 @@ function TransferBillForm() {
             <div className="main-col__box d-flex justify-content-between">
               <h2 className="main-col__heading">Hóa đơn chuyển tiền</h2>
               <div className="btn-group">
-                <a onClick={handleAdd} className="ms-auto btn-reset bg-yellow color-blue btn btn-md">
+                <div onClick={handleAdd} className="ms-auto btn-reset bg-yellow color-blue btn btn-md">
                   <i className="fa fa-plus"></i>
-                </a>
+                </div>
               </div>
             </div>
           </Col>

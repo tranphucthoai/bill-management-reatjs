@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import HomeCard from './../components/HomeCard/index';
 import { Col, Row } from 'react-bootstrap';
+import HomeCard from './../components/HomeCard/index';
 import './style.scss';
 
 Home.propTypes = {};

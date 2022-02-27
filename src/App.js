@@ -13,7 +13,7 @@ import SaleBill from './features/saleBill/pages/index';
 import TransferBill from './features/transferBill/pages';
 
 function App() {
-  const { userName } = useSelector((state) => state.loginUser);
+  // const { userName } = useSelector((state) => state.loginUser);
 
   return (
     <main className="main">
