@@ -138,27 +138,29 @@ function CollectionBillForm() {
 
   //handleView
   useEffect(() => {
-    (async () => {
-      try {
-        const fillVal = await collectionBillApi.get(idItem);
-        formik.setValues(
-          {
-            serviceNumber: fillVal.serviceNumber,
-            phone: fillVal.phone,
-            name: fillVal.name,
-            address: fillVal.address,
-            timeForPayment: fillVal.timeForPayment,
-            totalAmount: fillVal.totalAmount,
-            totalAmountText: VNnum2words(fillVal.totalAmount).trim() + ' đồng',
-          },
-          true
-        );
-        setSelectVal(fillVal.collectionCatalogId);
-        handleSelectedItem(fillVal.status, 'status');
-      } catch (error) {
-        console.log('Failed to fetch api', error);
-      }
-    })();
+    if (idItem) {
+      (async () => {
+        try {
+          const fillVal = await collectionBillApi.get(idItem);
+          formik.setValues(
+            {
+              serviceNumber: fillVal.serviceNumber,
+              phone: fillVal.phone,
+              name: fillVal.name,
+              address: fillVal.address,
+              timeForPayment: fillVal.timeForPayment,
+              totalAmount: fillVal.totalAmount,
+              totalAmountText: VNnum2words(fillVal.totalAmount).trim() + ' đồng',
+            },
+            true
+          );
+          setSelectVal(fillVal.collectionCatalogId);
+          handleSelectedItem(fillVal.status, 'status');
+        } catch (error) {
+          console.log('Failed to fetch api', error);
+        }
+      })();
+    }
   }, [idItem]);
 
   const handleView = (id) => {

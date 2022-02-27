@@ -191,37 +191,39 @@ function TransferBillForm() {
 
   //handleView
   useEffect(() => {
-    (async () => {
-      try {
-        const fillVal = await transferBillApi.get(idItem);
+    if (idItem) {
+      (async () => {
+        try {
+          const fillVal = await transferBillApi.get(idItem);
 
-        formik.setValues(
-          {
-            senderPhone: fillVal.senderPhone,
-            senderName: fillVal.senderName,
-            senderCardId: fillVal.senderCardId,
-            senderAddress: fillVal.senderAddress,
+          formik.setValues(
+            {
+              senderPhone: fillVal.senderPhone,
+              senderName: fillVal.senderName,
+              senderCardId: fillVal.senderCardId,
+              senderAddress: fillVal.senderAddress,
 
-            receiverPhone: fillVal.receiverPhone,
-            receiverName: fillVal.receiverName,
-            receiverCardId: fillVal.receiverCardId,
-            receiverAddress: fillVal.receiverAddress,
+              receiverPhone: fillVal.receiverPhone,
+              receiverName: fillVal.receiverName,
+              receiverCardId: fillVal.receiverCardId,
+              receiverAddress: fillVal.receiverAddress,
 
-            bankPlusPhone: fillVal.bankPlusPhone,
-            subTotal: fillVal.subTotal,
-            fees: fillVal.fees,
-            accountNumber: fillVal.accountNumber,
-            grandTotal: fillVal.grandTotal,
-            grandTotalText: VNnum2words(fillVal.grandTotal).trim() + ' đồng',
-          },
-          true
-        );
-        handleSelectedItem(fillVal.status, 'status');
-        handleSelectedItem(fillVal.formOfReceipt, 'formPayments');
-      } catch (error) {
-        console.log('Failed to fetch api', error);
-      }
-    })();
+              bankPlusPhone: fillVal.bankPlusPhone,
+              subTotal: fillVal.subTotal,
+              fees: fillVal.fees,
+              accountNumber: fillVal.accountNumber,
+              grandTotal: fillVal.grandTotal,
+              grandTotalText: VNnum2words(fillVal.grandTotal).trim() + ' đồng',
+            },
+            true
+          );
+          handleSelectedItem(fillVal.status, 'status');
+          handleSelectedItem(fillVal.formOfReceipt, 'formPayments');
+        } catch (error) {
+          console.log('Failed to fetch api', error);
+        }
+      })();
+    }
   }, [idItem]);
 
   const handleView = (id) => {

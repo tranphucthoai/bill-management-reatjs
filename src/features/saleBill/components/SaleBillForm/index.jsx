@@ -142,30 +142,32 @@ function SaleBillForm() {
 
   //handleView
   useEffect(() => {
-    (async () => {
-      try {
-        const fillVal = await saleReceiptsApi.get(idItem);
-        formik.setValues(
-          {
-            phone: fillVal.phone,
-            name: fillVal.name,
-            address: fillVal.address,
+    if (idItem) {
+      (async () => {
+        try {
+          const fillVal = await saleReceiptsApi.get(idItem);
+          formik.setValues(
+            {
+              phone: fillVal.phone,
+              name: fillVal.name,
+              address: fillVal.address,
 
-            productNumber: fillVal.productNumber,
-            quantity: fillVal.quantity,
-            price: fillVal.price,
+              productNumber: fillVal.productNumber,
+              quantity: fillVal.quantity,
+              price: fillVal.price,
 
-            totalAmount: fillVal.totalAmount,
-            totalAmountText: VNnum2words(fillVal.totalAmount).trim() + ' đồng',
-          },
-          true
-        );
-        setSelectVal(fillVal.saleCatalogId);
-        handleSelectedItem(fillVal.status, 'status');
-      } catch (error) {
-        console.log('Failed to fetch api', error);
-      }
-    })();
+              totalAmount: fillVal.totalAmount,
+              totalAmountText: VNnum2words(fillVal.totalAmount).trim() + ' đồng',
+            },
+            true
+          );
+          setSelectVal(fillVal.saleCatalogId);
+          handleSelectedItem(fillVal.status, 'status');
+        } catch (error) {
+          console.log('Failed to fetch api', error);
+        }
+      })();
+    }
   }, [idItem]);
 
   const handleView = (id) => {
