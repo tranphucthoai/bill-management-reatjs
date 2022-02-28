@@ -83,3 +83,10 @@
     }
   }
 }
+
+@include respond-to('xxs') {
+  .main-col {
+    background-color: $bg-primary;
+    padding: 20px 0px;
+  }
+}

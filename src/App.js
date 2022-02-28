@@ -3,6 +3,7 @@ import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Route, Routes } from 'react-router-dom';
 import './app.scss';
+import MenuMobile from './components/MenuMobile';
 import SideBar from './components/SideBar';
 import CollectionBill from './features/collectionBill/pages/index';
 import Home from './features/home/pages';
@@ -36,6 +37,7 @@ function App() {
                 <Route path="*" element={<Login />} />
               </Routes>
             )}
+            <MenuMobile />
           </Col>
         </Row>
       </Container>

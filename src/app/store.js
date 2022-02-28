@@ -4,6 +4,7 @@ import saleBillReducer from '../features/saleBill/salesBillSlice';
 import collectionBillReducer from '../features/collectionBill/collectionBillSlice';
 import receiveBillReducer from '../features/receiveBill/receiveBillSlice';
 import loginUser from '../features/login/loginSlice';
+import menuMobileReducer from '../components/MenuMobile/menuMoblieSlice';
 
 const rootReducer = {
   transferBill: transferBillReducer,
@@ -11,6 +12,7 @@ const rootReducer = {
   collectionBill: collectionBillReducer,
   receiveBill: receiveBillReducer,
   loginUser: loginUser,
+  menuMobile: menuMobileReducer,
 };
 
 const store = configureStore({

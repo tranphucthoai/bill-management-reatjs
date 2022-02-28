@@ -8,6 +8,7 @@ import saleReceiptsApi from '../../../../api/saleBillApi';
 import RadioGroup from '../../../../components/formControls/RadioGroup/index';
 import SelectField from '../../../../components/formControls/SelectField';
 import TextField from '../../../../components/formControls/TextField/index';
+import Heading from '../../../../components/Heading';
 import { create, edit } from '../../salesBillSlice';
 import SaleBillTable from '../SaleBillTable/index';
 import saleCatalogApi from './../../../../api/saleCatalogApi';
@@ -239,18 +240,7 @@ function SaleBillForm() {
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
-        <Row>
-          <Col xs={12}>
-            <div className="main-col__box d-flex justify-content-between">
-              <h2 className="main-col__heading">Hóa đơn bán hàng</h2>
-              <div className="btn-group">
-                <div onClick={handleAdd} className="ms-auto btn-reset bg-yellow color-blue btn btn-md">
-                  <i className="fa fa-plus"></i>
-                </div>
-              </div>
-            </div>
-          </Col>
-        </Row>
+        <Heading title="Hoá Đơn Bán Hàng" handleAdd={handleAdd} />
         <Row>
           <Col md={6}>
             <h4 className="main-col__title">Thông tin khách gửi</h4>
@@ -318,13 +308,13 @@ function SaleBillForm() {
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
+          <Col xs={12} sm={6}>
             <h4 className="main-col__title">Trạng thái xử lý</h4>
             <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
           </Col>
-          <Col md={6}>
+          <Col xs={12} sm={6}>
             <h4 className="main-col__title">Tác Vụ</h4>
-            <div className="d-flex">
+            <div className="d-flex mb-3">
               <Button type="submit" variant="md" className="btn-reset bg-yellow color-blue">
                 <i className="fa fa-print"></i> {isUpdate ? 'Cập nhật' : 'Lưu'}
               </Button>

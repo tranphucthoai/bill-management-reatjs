@@ -1,7 +1,14 @@
-@import "~bootstrap/scss/bootstrap";
-@import "./assets/scss/style.scss";
-@include respond-to("lg") {
-  .sidebar {
+@import '~bootstrap/scss/bootstrap';
+@import './assets/scss/style.scss';
+@import './assets/scss/_variable.scss';
+@include respond-to('lg') {
+  .sidebar:not(.offcanvas-menu) {
     display: none !important;
+  }
+}
+
+.main {
+  .col-xl-3 {
+    background-color: $text-white;
   }
 }
