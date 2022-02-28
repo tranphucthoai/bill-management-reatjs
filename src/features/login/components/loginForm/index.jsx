@@ -17,7 +17,7 @@ function LoginForm() {
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
-      password: '',
+      password: '123456789',
     },
     validationSchema: Yup.object({
       password: Yup.string().min(6, 'Password ít nhất 6 chữ số').required('Vui lòng nhập password'),
