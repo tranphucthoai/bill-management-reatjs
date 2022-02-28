@@ -12,6 +12,7 @@ import SaleBill from './features/saleBill/pages/index';
 import TransferBill from './features/transferBill/pages';
 
 function App() {
+  const userName = localStorage.getItem('userName');
   return (
     <main className="main">
       <Container fluid>
@@ -20,15 +21,21 @@ function App() {
             <SideBar />
           </Col>
           <Col xl={9}>
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/transferBill" element={<TransferBill />} />
-              <Route path="/saleBill" element={<SaleBill />} />
-              <Route path="/collectionBill" element={<CollectionBill />} />
-              <Route path="/receiveBill" element={<ReceiveBill />} />
-            </Routes>
+            {userName && userName?.length > 0 ? (
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/transferBill" element={<TransferBill />} />
+                <Route path="/saleBill" element={<SaleBill />} />
+                <Route path="/collectionBill" element={<CollectionBill />} />
+                <Route path="/receiveBill" element={<ReceiveBill />} />
+              </Routes>
+            ) : (
+              <Routes>
+                <Route path="*" element={<Login />} />
+              </Routes>
+            )}
           </Col>
         </Row>
       </Container>

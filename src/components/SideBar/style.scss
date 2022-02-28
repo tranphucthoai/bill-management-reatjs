@@ -16,6 +16,7 @@
   &__heading {
     text-align: center;
     font-size: 1rem;
+    white-space: pre-line;
   }
   &__thumb {
     img {
@@ -37,7 +38,7 @@
         margin-right: 5px;
       }
       > p {
-        // text-align: center;
+        white-space: pre-line;
       }
     }
   }

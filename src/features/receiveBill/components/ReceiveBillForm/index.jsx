@@ -200,6 +200,11 @@ function ReceiveBillForm() {
     }
     showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công trạng thái một trường');
     setReload((prev) => !prev);
+
+    if (id === idItem) {
+      dispatch(edit(''));
+      handleView(id);
+    }
   };
   //handleView
 

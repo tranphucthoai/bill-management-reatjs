@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import './style.scss';
-import { Dropdown, Button } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
-import branchsApi from './../../api/branchsApi';
+import { Button, Dropdown } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../../features/login/loginSlice';
-import { useNavigate, Link } from 'react-router-dom';
+import branchsApi from './../../api/branchsApi';
+import './style.scss';
 
 function SideBar() {
   const { userName } = useSelector((state) => state.loginUser);
@@ -34,24 +34,24 @@ function SideBar() {
     <aside className="sidebar">
       <div className="sidebar-inner">
         <h3 className="sidebar__heading mb-4">{user.name}</h3>
-        <Dropdown className="sidebar__dropdown">
+        <Dropdown className="sidebar__dropdown dropdown-normal" autoClose={true}>
           <Dropdown.Toggle variant="success" id="dropdown-basic" className="btn-reset">
             Chọn loại hoá đơn
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            <Link variant={Dropdown.Item} to="/saleBill">
+            <Dropdown.Item as={Link} to="/saleBill">
               Hoá Đơn Bán Hàng
-            </Link>
-            <Link variant={Dropdown.Item} to="/transferBill">
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to="/transferBill">
               Hoá Đơn Chuyển Tiền
-            </Link>
-            <Link variant={Dropdown.Item} to="/collectionBill">
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to="/collectionBill">
               Hoá Đơn Nhận Tiền
-            </Link>
-            <Link variant={Dropdown.Item} to="/receiveBill">
+            </Dropdown.Item>
+            <Dropdown.Item as={Link} to="/receiveBill">
               Hoá Đơn Thu Hộ
-            </Link>
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
 
