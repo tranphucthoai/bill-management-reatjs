@@ -3,17 +3,10 @@ import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { Route, Routes } from 'react-router-dom';
 import './app.scss';
-import MenuMobile from './components/MenuMobile';
-import SideBar from './components/SideBar';
-import CollectionBill from './features/collectionBill/pages/index';
-import Home from './features/home/pages';
-import Login from './features/login/pages';
-import ReceiveBill from './features/receiveBill/pages/index';
-import SaleBill from './features/saleBill/pages/index';
-import TransferBill from './features/transferBill/pages';
+import { MenuMobile, SideBar } from './components';
+import { CollectionBill, Home, Login, ReceiveBill, SaleBill, TransferBill } from './features';
 
 function App() {
-  const userName = localStorage.getItem('userName');
   return (
     <main className="main">
       <Container fluid>
@@ -22,21 +15,15 @@ function App() {
             <SideBar />
           </Col>
           <Col xl={9}>
-            {userName && userName?.length > 0 ? (
-              <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/transferBill" element={<TransferBill />} />
-                <Route path="/saleBill" element={<SaleBill />} />
-                <Route path="/collectionBill" element={<CollectionBill />} />
-                <Route path="/receiveBill" element={<ReceiveBill />} />
-              </Routes>
-            ) : (
-              <Routes>
-                <Route path="*" element={<Login />} />
-              </Routes>
-            )}
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/transferBill" element={<TransferBill />} />
+              <Route path="/saleBill" element={<SaleBill />} />
+              <Route path="/collectionBill" element={<CollectionBill />} />
+              <Route path="/receiveBill" element={<ReceiveBill />} />
+            </Routes>
             <MenuMobile />
           </Col>
         </Row>
