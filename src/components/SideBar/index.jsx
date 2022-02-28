@@ -3,7 +3,7 @@ import { Button, Dropdown } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../../features/login/loginSlice';
-import branchsApi from './../../api/branchsApi';
+import { branchsApi } from './../../api';
 import './style.scss';
 
 function SideBar() {
@@ -46,10 +46,10 @@ function SideBar() {
             <Dropdown.Item as={Link} to="/transferBill">
               Hoá Đơn Chuyển Tiền
             </Dropdown.Item>
-            <Dropdown.Item as={Link} to="/collectionBill">
+            <Dropdown.Item as={Link} to="/receiveBill">
               Hoá Đơn Nhận Tiền
             </Dropdown.Item>
-            <Dropdown.Item as={Link} to="/receiveBill">
+            <Dropdown.Item as={Link} to="/collectionBill">
               Hoá Đơn Thu Hộ
             </Dropdown.Item>
           </Dropdown.Menu>

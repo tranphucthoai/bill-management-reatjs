@@ -4,11 +4,9 @@ import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import saleReceiptsApi from '../../../../api/saleBillApi';
-import TextFieldBtn from '../../../../components/formControls/TextFieldBtn/index';
-import Loader from '../../../../components/Loader';
-import PaginationNormal from './../../../../components/PaginationNormal/index';
-import { formatPrice } from './../../../../constans/common';
+import { saleBillApi } from '../../../../api';
+import { Loader, PaginationNormal, TextFieldBtn } from './../../../../components';
+import { formatPrice } from './../../../../constans';
 
 SaleBillTable.propTypes = {
   reLoad: propTypes.bool,
@@ -36,7 +34,7 @@ function SaleBillTable({ reLoad = false, handleDelete = null, handleEdit = null,
   useEffect(() => {
     (async () => {
       try {
-        const { data, pagination } = await saleReceiptsApi.getAll(queryParams);
+        const { data, pagination } = await saleBillApi.getAll(queryParams);
         setData(data);
         setPagination(pagination);
       } catch (error) {

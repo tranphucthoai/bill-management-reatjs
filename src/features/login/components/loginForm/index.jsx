@@ -4,11 +4,9 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import Loader from '../../../../components/Loader';
 import { login } from '../../loginSlice';
-import branchsApi from './../../../../api/branchsApi';
-import SelectField from './../../../../components/formControls/SelectField/index';
-import TextField from './../../../../components/formControls/TextField/index';
+import { branchsApi } from './../../../../api';
+import { Loader, SelectField, TextField } from './../../../../components';
 import './style.scss';
 
 function LoginForm() {
@@ -58,7 +56,7 @@ function LoginForm() {
   return (
     <Container>
       <Row className="justify-content-center">
-        <Col sx={12} sm={4}>
+        <Col sx={12} sm={8} md={6} lg={4}>
           <form
             onSubmit={formik.handleSubmit}
             className="d-flex flex-column justify-content-center align-items-center login-form"

@@ -1,21 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import './style.scss';
-import { Button, Offcanvas, Dropdown } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Button, Dropdown, Offcanvas } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../../features/login/loginSlice';
-import branchsApi from './../../api/branchsApi';
+import { branchsApi } from './../../api';
 import { hide } from './menuMoblieSlice';
+import './style.scss';
 
-MenuMobile.propTypes = {};
-
-function MenuMobile(props) {
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
+function MenuMobile() {
+  const { isShow } = useSelector((state) => state.menuMobile);
   /* */
   const { userName } = useSelector((state) => state.loginUser);
   const [user, setUser] = useState({});
@@ -39,39 +32,38 @@ function MenuMobile(props) {
   const handleLogin = () => {
     navigate('/login');
   };
+
+  const handleHide = () => {
+    dispatch(hide());
+  };
   return (
     <>
-      <Button variant="primary" onClick={handleShow}>
-        Launch
-      </Button>
-
-      <Offcanvas show={show} onHide={handleClose} className="sidebar offcanvas-menu">
-        <Offcanvas.Header closeButton></Offcanvas.Header>
+      <Offcanvas show={isShow} onHide={handleHide} className="sidebar offcanvas-menu">
+        <Offcanvas.Header className="offcanvas-menu__close" closeButton></Offcanvas.Header>
         <Offcanvas.Body className="sidebar-inner">
           <h3 className="sidebar__heading mb-4">{user.name}</h3>
-          <Dropdown className="sidebar__dropdown dropdown-normal" autoClose={true}>
+          <Dropdown className="sidebar__dropdown dropdown-normal mb-4" autoClose={true}>
             <Dropdown.Toggle variant="success" id="dropdown-basic" className="btn-reset">
               Chọn loại hoá đơn
             </Dropdown.Toggle>
-
             <Dropdown.Menu>
-              <Dropdown.Item as={Link} to="/saleBill">
+              <Dropdown.Item as={Link} onClick={() => handleHide()} to="/saleBill">
                 Hoá Đơn Bán Hàng
               </Dropdown.Item>
-              <Dropdown.Item as={Link} to="/transferBill">
+              <Dropdown.Item as={Link} onClick={() => handleHide()} to="/transferBill">
                 Hoá Đơn Chuyển Tiền
               </Dropdown.Item>
-              <Dropdown.Item as={Link} to="/collectionBill">
+              <Dropdown.Item as={Link} onClick={() => handleHide()} to="/receiveBill">
                 Hoá Đơn Nhận Tiền
               </Dropdown.Item>
-              <Dropdown.Item as={Link} to="/receiveBill">
+              <Dropdown.Item as={Link} onClick={() => handleHide()} to="/collectionBill">
                 Hoá Đơn Thu Hộ
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
 
           {userName.length > 0 && (
-            <ul className="sidebar__info">
+            <ul className="sidebar__info mb-3">
               <li>
                 <i className="fa fa-map-marker"></i>
                 <p>{user.address}</p>
@@ -97,7 +89,7 @@ function MenuMobile(props) {
             </ul>
           )}
 
-          <div className="sidebar__action mt-4">
+          <div className="sidebar__action">
             <Button
               onClick={userName ? handleLogout : handleLogin}
               className="mb-3"

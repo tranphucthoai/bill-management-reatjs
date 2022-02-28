@@ -4,15 +4,10 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import saleReceiptsApi from '../../../../api/saleBillApi';
-import RadioGroup from '../../../../components/formControls/RadioGroup/index';
-import SelectField from '../../../../components/formControls/SelectField';
-import TextField from '../../../../components/formControls/TextField/index';
-import Heading from '../../../../components/Heading';
 import { create, edit } from '../../salesBillSlice';
 import SaleBillTable from '../SaleBillTable/index';
-import saleCatalogApi from './../../../../api/saleCatalogApi';
-import ToastNormal from './../../../../components/ToastNormal/index';
+import { saleBillApi, saleCatalogApi } from './../../../../api';
+import { Heading, RadioGroup, SelectField, TextField, ToastNormal } from './../../../../components';
 
 function SaleBillForm() {
   const [reLoad, setReload] = useState(false);
@@ -58,14 +53,14 @@ function SaleBillForm() {
 
       if (isUpdate) {
         try {
-          await saleReceiptsApi.update(idItem, values);
+          await saleBillApi.update(idItem, values);
         } catch (error) {
           showToastItem('danger', 'Lỗi Quá Trình Cập Nhật !!!', error);
         }
         showToastItem('success', 'Cập Nhật Thành Công', 'Đã cập nhật thành công một trường');
       } else {
         try {
-          await saleReceiptsApi.add(values);
+          await saleBillApi.add(values);
         } catch (error) {
           showToastItem('danger', 'Lỗi Quá Trình Thêm Mới !!!', error);
         }
@@ -117,7 +112,7 @@ function SaleBillForm() {
   //handleDelete
   const handleDelete = async (id) => {
     try {
-      await saleReceiptsApi.remove(id);
+      await saleBillApi.remove(id);
     } catch (error) {
       showToastItem('danger', 'Lỗi Quá Trình Xoá !!!', error);
     }
@@ -131,7 +126,7 @@ function SaleBillForm() {
   //handleEdit
   const handleEdit = async (id, checked) => {
     try {
-      await saleReceiptsApi.update(id, {
+      await saleBillApi.update(id, {
         status: checked,
       });
     } catch (error) {
@@ -150,7 +145,7 @@ function SaleBillForm() {
     if (idItem) {
       (async () => {
         try {
-          const fillVal = await saleReceiptsApi.get(idItem);
+          const fillVal = await saleBillApi.get(idItem);
           formik.setValues(
             {
               phone: fillVal.phone,

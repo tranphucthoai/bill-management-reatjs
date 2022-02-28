@@ -1,14 +1,12 @@
+import moment from 'moment';
+import propTypes from 'prop-types';
+import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import receiveReceiptsApi from '../../../../api/receiveBillApi';
-import TextFieldBtn from '../../../../components/formControls/TextFieldBtn/index';
-import { formatPrice } from './../../../../constans/common';
-import propTypes from 'prop-types';
-import queryString from 'query-string';
-import moment from 'moment';
-import Loader from '../../../../components/Loader';
-import PaginationNormal from '../../../../components/PaginationNormal';
+import { receiveBillApi } from '../../../../api';
+import { Loader, PaginationNormal, TextFieldBtn } from '../../../../components';
+import { formatPrice } from './../../../../constans';
 
 ReceiveBillTable.propTypes = {
   reLoad: propTypes.bool,
@@ -36,7 +34,7 @@ function ReceiveBillTable({ reLoad = false, handleDelete = null, handleEdit = nu
   useEffect(() => {
     (async () => {
       try {
-        const { data, pagination } = await receiveReceiptsApi.getAll(queryParams);
+        const { data, pagination } = await receiveBillApi.getAll(queryParams);
         setData(data);
         setPagination(pagination);
       } catch (error) {

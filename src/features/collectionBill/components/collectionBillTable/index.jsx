@@ -4,11 +4,9 @@ import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import collectionBillApi from '../../../../api/collectionBillApi';
-import TextFieldBtn from '../../../../components/formControls/TextFieldBtn/index';
-import Loader from '../../../../components/Loader';
-import PaginationNormal from '../../../../components/PaginationNormal';
-import { formatPrice } from './../../../../constans/common';
+import { collectionBillApi } from '../../../../api';
+import { Loader, PaginationNormal, TextFieldBtn } from '../../../../components';
+import { formatPrice } from './../../../../constans';
 
 CollectionBillTable.propTypes = {
   reLoad: propTypes.bool,

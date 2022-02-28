@@ -4,13 +4,9 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import collectionBillApi from '../../../../api/collectionBillApi';
-import RadioGroup from '../../../../components/formControls/RadioGroup/index';
-import SelectField from '../../../../components/formControls/SelectField';
-import TextField from '../../../../components/formControls/TextField/index';
-import ToastNormal from '../../../../components/ToastNormal';
+import { Heading, RadioGroup, SelectField, TextField, ToastNormal } from '../../../../components';
 import { create, edit } from '../../collectionBillSlice';
-import collectionCatalogApi from './../../../../api/collectionCatalogApi';
+import { collectionBillApi, collectionCatalogApi } from './../../../../api';
 import CollectionBillTable from './../collectionBillTable/index';
 
 function CollectionBillForm() {
@@ -227,18 +223,7 @@ function CollectionBillForm() {
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
-        <Row>
-          <Col xs={12}>
-            <div className="main-col__box d-flex justify-content-between">
-              <h2 className="main-col__heading">Hóa đơn thu hộ</h2>
-              <div className="btn-group">
-                <div onClick={handleAdd} className="ms-auto btn-reset bg-yellow color-blue btn btn-md">
-                  <i className="fa fa-plus"></i>
-                </div>
-              </div>
-            </div>
-          </Col>
-        </Row>
+        <Heading title="Hóa Đơn Thu Hộ" handleAdd={handleAdd} />
         <Row>
           <Col md={6}>
             <h4 className="main-col__title">Thông tin dịch vụ thu hộ</h4>
@@ -291,13 +276,13 @@ function CollectionBillForm() {
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
+          <Col xs={12} sm={6}>
             <h4 className="main-col__title">Trạng thái xử lý</h4>
             <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
           </Col>
-          <Col md={6}>
+          <Col xs={12} sm={6}>
             <h4 className="main-col__title">Tác Vụ</h4>
-            <div className="d-flex">
+            <div className="d-flex mb-3">
               <Button type="submit" variant="md" className="btn-reset bg-yellow color-blue">
                 <i className="fa fa-print"></i> {isUpdate ? 'Cập nhật' : 'Lưu'}
               </Button>

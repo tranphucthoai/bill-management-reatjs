@@ -4,14 +4,11 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { default as VNnum2words } from 'vn-num2words';
 import * as Yup from 'yup';
-import receiveBillApi from '../../../../api/receiveBillApi';
-import RadioGroup from '../../../../components/formControls/RadioGroup/index';
-import SelectField from '../../../../components/formControls/SelectField';
-import TextField from '../../../../components/formControls/TextField/index';
 import { create, edit } from '../../receiveBillSlice';
 import ReceiveBillTable from './../ReceiveBillTable/index';
-import banksApi from './../../../../api/banksApi';
-import ToastNormal from '../../../../components/ToastNormal';
+import { banksApi, receiveBillApi } from './../../../../api';
+import { ToastNormal, TextField, SelectField, RadioGroup, Heading } from '../../../../components';
+import './style.scss';
 
 function ReceiveBillForm() {
   const [reLoad, setReload] = useState(false);
@@ -140,7 +137,6 @@ function ReceiveBillForm() {
   ]);
 
   //handle Selected Item (status or formPayments)
-
   const handleSelectedItem = (index = 0, nameGroup) => {
     if (nameGroup === 'status') {
       const newStatus = [...status];
@@ -309,19 +305,8 @@ function ReceiveBillForm() {
 
   return (
     <>
-      <form onSubmit={formik.handleSubmit}>
-        <Row>
-          <Col xs={12}>
-            <div className="main-col__box d-flex justify-content-between">
-              <h2 className="main-col__heading">Hóa đơn nhận tiền</h2>
-              <div className="btn-group">
-                <div onClick={handleAdd} className="ms-auto btn-reset bg-yellow color-blue btn btn-md">
-                  <i className="fa fa-plus"></i>
-                </div>
-              </div>
-            </div>
-          </Col>
-        </Row>
+      <form onSubmit={formik.handleSubmit} className="bill-special">
+        <Heading title="Hóa Đơn Nhận Tiền" handleAdd={handleAdd} />
         <Row>
           <Col md={6}>
             <h4 className="main-col__title">Thông tin khách gửi</h4>
@@ -436,9 +421,9 @@ function ReceiveBillForm() {
           </Col>
           <Col md={6}>
             <h4 className="main-col__title">Trạng thái xử lý</h4>
-            <div className="d-flex">
+            <div className="d-flex flex-wrap box-save">
               <RadioGroup handleChange={handleSelectedItem} nameGroup="status" value={status} />
-              <Button type="submit" variant="md" className="ms-5 btn-reset bg-yellow color-blue">
+              <Button type="submit" variant="md" className="ms-5 mb-3 btn-reset bg-yellow color-blue">
                 <i className="fa fa-print"></i> {isUpdate ? 'Cập nhật' : 'Lưu'}
               </Button>
             </div>

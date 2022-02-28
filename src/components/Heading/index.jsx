@@ -1,16 +1,18 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import './style.scss';
+import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { show } from '../MenuMobile/menuMoblieSlice';
+import clsx from 'clsx';
+import './style.scss';
 
 Heading.propTypes = {
   title: PropTypes.string,
   handleAdd: PropTypes.func,
+  hideBtnAdd: PropTypes.bool,
 };
 
-function Heading({ title = '', handleAdd = null }) {
+function Heading({ title = '', handleAdd = null, hideBtnAdd = false }) {
   const dispatch = useDispatch();
   const handleShowMenu = () => {
     dispatch(show());
@@ -23,7 +25,7 @@ function Heading({ title = '', handleAdd = null }) {
             <i className="fa fa-bars"></i>
           </div>
           <h2 className="main-col__heading flex-fill">{title}</h2>
-          <div className="btn-group">
+          <div className={clsx('btn-group', hideBtnAdd && 'd-none')}>
             <div onClick={handleAdd} className="ms-auto btn-reset bg-yellow color-blue btn btn-md">
               <i className="fa fa-plus"></i>
             </div>

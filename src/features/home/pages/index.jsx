@@ -2,6 +2,7 @@ import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import HomeCard from './../components/HomeCard/index';
 import './style.scss';
+import { Heading } from './../../../components';
 
 Home.propTypes = {};
 
@@ -38,7 +39,8 @@ function Home(props) {
   ];
   return (
     <section className="main-col">
-      <Row className="flex-space-20 align-items-center">
+      <Heading hideBtnAdd={true} />
+      <Row className="flex-space-20 align-items-center mt-2 mt-lg-0">
         {data.map((item) => (
           <Col key={item.id} sm={6}>
             <HomeCard data={item} />

@@ -1,0 +1,18 @@
+@media (max-width: 335px) {
+  .bill-special {
+    .radio-group {
+      flex-wrap: wrap;
+      > li:last-child:not(:nth-child(2)):not(:nth-child(1)) {
+        margin-top: 1rem;
+      }
+    }
+    .box-save {
+      .btn-reset {
+        margin-left: 0 !important;
+      }
+      .radio-group {
+        width: 100%;
+      }
+    }
+  }
+}

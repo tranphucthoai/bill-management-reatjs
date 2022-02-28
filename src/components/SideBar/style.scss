@@ -1,14 +1,20 @@
 @import '../../assets/scss/variable';
 
 .sidebar {
+  &:not(.offcanvas-menu) {
+    align-items: center;
+    .sidebar-inner {
+      justify-content: center;
+    }
+  }
+  &.offcanvas-menu {
+    padding-top: 40px;
+  }
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
   &-inner {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     height: 100%;
   }

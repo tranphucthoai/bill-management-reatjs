@@ -4,11 +4,9 @@ import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Row, Table } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import transferBillApi from '../../../../api/transferBillApi';
-import TextFieldBtn from './../../../../components/formControls/TextFieldBtn/index';
-import Loader from './../../../../components/Loader/index';
-import PaginationNormal from './../../../../components/PaginationNormal/index';
-import { formatPrice } from './../../../../constans/common';
+import { transferBillApi } from '../../../../api';
+import { Loader, PaginationNormal, TextFieldBtn } from './../../../../components';
+import { formatPrice } from './../../../../constans';
 
 TransferBillTable.propTypes = {
   reLoad: propTypes.bool,
